@@ -1,0 +1,600 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>رحلة أثر</title>
+<meta name="description" content="رحلة فريقك في برنامج أثر · معامل نون">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap">
+<style>
+/* Layout: phone-first single column app; screens swap in place; plant is the team's progress */
+:root{
+  --maplab:#f7cfe0; --maplabh:#f0a9c8;
+  --roadbg:#f6dde8; --roaddot:#ffffff;
+  --bg:#fbfbf9; --card:#ffffff; --fg:#15161A; --mut:#7d7d78; --line:#eae7df; --soft:#f3f1ec; --land:#e9e6de;
+  --mint:#64D8AE; --teal:#0C8075; --mintlt:#E6F7F1;
+  --athr:#d9558f; --athrdk:#a8336a; --athrlt:#fbe9f1; --athrtx:#a8336a;
+  --gold:#d99b2b; --leaf:#3fa27c; --soil:#6b4a2f; --pot:#0C8075; --potrim:#0a6b62; --sky:#E6F7F1;
+  --font:"IBM Plex Sans Arabic",-apple-system,"SF Arabic","Segoe UI",Tahoma,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141518; --card:#1d1f23; --fg:#ecebe7; --mut:#9b9a95; --line:#2d2f34; --soft:#25272c; --land:#2a2c31;
+  --mintlt:#16312a; --athrlt:#3a1d2b; --athrtx:#f08bb6; --sky:#17302a; --leaf:#4bb88d; --roadbg:#3a2530; --roaddot:#6b4a5a; --maplab:#5a2a40; --maplabh:#7a3656; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141518; --card:#1d1f23; --fg:#ecebe7; --mut:#9b9a95; --line:#2d2f34; --soft:#25272c; --land:#2a2c31;
+  --mintlt:#16312a; --athrlt:#3a1d2b; --athrtx:#f08bb6; --sky:#17302a; --leaf:#4bb88d; --roadbg:#3a2530; --roaddot:#6b4a5a; --maplab:#5a2a40; --maplabh:#7a3656; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:16px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
+#app{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-weight:600;margin:0;text-wrap:balance}
+p{margin:0}
+button{font-family:inherit;cursor:pointer;color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--mint);outline-offset:2px}
+.screen{display:flex;flex-direction:column;gap:16px;animation:in .3s ease-out both}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:32px}
+.logo{height:24px;width:auto;color:var(--fg)}
+.back{border:0;background:var(--soft);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
+.demo{font-size:12px;color:var(--mut);background:var(--soft);padding:2px 10px;border-radius:999px}
+.steps{display:flex;gap:6px}
+.steps i{flex:1;height:5px;border-radius:9px;background:var(--line)}
+.steps i.on{background:var(--athr)}
+.eyebrow{font-size:13px;font-weight:600;color:var(--athrtx)}
+.title{font-size:24px;line-height:1.4}
+.sub{color:var(--mut);font-size:15px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.btn{width:100%;border:0;border-radius:14px;padding:14px;font-size:17px;font-weight:600;background:var(--athrdk);color:#fff;transition:transform .1s,opacity .15s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--fg)}
+.btn.mint{background:var(--teal)}
+
+/* hero */
+.hero{background:var(--sky);border-radius:24px;padding:22px 18px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.hero .pill{background:var(--athr);color:#fff;font-size:13px;font-weight:600;padding:3px 12px;border-radius:999px}
+.hero h1{font-size:30px}
+.hero .plant{max-width:180px}
+
+/* map */
+.mapbox{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:10px}
+.map{display:block;width:100%;height:auto}
+.map path{fill:var(--land);stroke:var(--card);stroke-width:2.5}
+.map path.lab{fill:var(--maplab);cursor:pointer;transition:fill .15s}
+.map path.lab:hover{fill:var(--maplabh)}
+.map text{font:600 26px var(--font);fill:var(--athrtx);pointer-events:none;paint-order:stroke;stroke:var(--card);stroke-width:6px}
+.map .pulse{fill:#fff;animation:pulse 1.8s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(2.4)}}
+.legend{display:flex;gap:14px;justify-content:center;font-size:13px;color:var(--mut);padding-top:6px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-left:6px;vertical-align:middle;background:var(--athr)}
+.legend span::before{display:none}
+.mpl{cursor:pointer;transform-box:fill-box;transform-origin:50% 100%;animation:sway 4s ease-in-out infinite}
+.mpl:hover,.mpl:focus{transform:scale(1.25)}
+.mpl:focus{outline:none}
+.rcount{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.rcount button{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;text-align:right;display:flex;flex-direction:column;gap:4px}
+.rcount button:hover{border-color:var(--athr)}
+.rcount b{font-weight:600;font-size:15px}
+.rcount span{display:flex;flex-wrap:wrap;gap:1px}
+.rcount i{width:11px;height:12px;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='2 8 36 28'%3E%3Cpath d='M20 34 C18 26 22 20 20 12' stroke='%233fa27c' stroke-width='3.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M20 24 C14 16 6 18 4 21 C8 26 15 27 20 24Z' fill='%233fa27c'/%3E%3Cpath d='M20 18 C25 10 33 11 36 14 C32 20 25 21 20 18Z' fill='%2364D8AE'/%3E%3C/svg%3E")}
+.rcount small{font-size:12.5px;color:var(--mut)}
+
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:12px;width:100%;text-align:right;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px;font-size:17px;font-weight:600;transition:border-color .15s}
+.row:hover{border-color:var(--athr)}
+.row small{display:block;font-size:13px;color:var(--mut);font-weight:400}
+.row .ic{flex:none;width:40px;height:40px;border-radius:12px;background:var(--athrlt);display:grid;place-items:center}
+.row .ic svg{width:20px;height:20px;stroke:var(--athrtx);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.row .go{margin-right:auto;color:var(--mut);font-size:20px}
+
+label.f{display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600}
+label.f small{font-weight:400;color:var(--mut);font-size:13px}
+input.in,select.in,textarea.in{font-family:inherit;font-size:16px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);width:100%}
+.members{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.choices{display:flex;flex-wrap:wrap;gap:8px}
+.ch{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-size:15px}
+.ch[aria-pressed="true"]{border-color:var(--athr);background:var(--athrlt);color:var(--athrtx);font-weight:600}
+.sugg{display:flex;flex-wrap:wrap;gap:6px}
+.sugg button{border:1px dashed var(--athr);background:transparent;color:var(--athrtx);border-radius:999px;padding:5px 12px;font-size:13.5px}
+.carry{background:var(--athrlt);border-radius:12px;padding:10px 12px;font-size:14px}
+.carry b{color:var(--athrtx);font-weight:600}
+.role{display:flex;align-items:center;gap:10px}
+.role span{flex:1;font-weight:600;font-size:15px;min-width:0}
+.role select{flex:1.3}
+
+.code{font-size:44px;font-weight:600;letter-spacing:8px;text-align:center;color:var(--teal);direction:ltr;font-variant-numeric:tabular-nums}
+
+/* home */
+.garden{position:relative;background:var(--sky);border-radius:24px;padding:14px 14px 6px;overflow:hidden}
+.garden .head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.garden h2{font-size:19px}
+.garden .lab{font-size:13px;color:var(--mut)}
+.stage{font-size:13px;color:var(--teal);font-weight:600;background:var(--card);padding:2px 10px;border-radius:999px;white-space:nowrap}
+.plant{display:block;width:100%;max-width:230px;height:auto;margin:0 auto}
+.sway{transform-origin:100px 196px;animation:sway 5s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.4deg)}50%{transform:rotate(1.4deg)}}
+.stem{fill:none;stroke:var(--leaf);stroke-width:6;stroke-linecap:round;stroke-dasharray:100;transition:stroke-dashoffset .9s ease-out}
+.grow{transform:scale(0);transition:transform .55s cubic-bezier(.2,.9,.3,1.25) .45s}
+.grow.on{transform:scale(1)}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+
+.path{position:relative;display:flex;flex-direction:column;gap:10px;padding-right:30px}
+.path::before{content:"";position:absolute;right:12px;top:18px;bottom:18px;border-right:3px dotted var(--line)}
+.st{position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:right;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px}
+.st .node{position:absolute;right:-30px;top:50%;margin-top:-13px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--card);border:3px solid var(--line);font-size:12px;font-weight:600;color:var(--mut)}
+.st .nm{flex:1;min-width:0}
+.st .nm b{display:block;font-size:16px;font-weight:600}
+.st .nm small{font-size:13px;color:var(--mut)}
+.st .tag{flex:none;font-size:12.5px;font-weight:600;padding:3px 11px;border-radius:999px}
+.st.done{border-color:color-mix(in srgb,var(--teal) 35%,var(--line))}
+.st.done .node{background:var(--teal);border-color:var(--teal);color:#fff}
+.st.done .tag{background:var(--mintlt);color:var(--teal)}
+.st.open{border-color:var(--athr);box-shadow:0 0 0 4px var(--athrlt)}
+.st.open .node{border-color:var(--athr);color:var(--athrtx)}
+.st.open .tag{background:var(--athr);color:#fff}
+.st.lock{opacity:.6;cursor:not-allowed}
+.st.lock .tag{background:var(--soft);color:var(--mut)}
+.st.day .node{border-color:var(--gold)}
+
+.sect{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.sect::before{content:"";width:4px;height:15px;border-radius:2px;background:var(--athr)}
+.mini{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.mini div{flex:none;width:96px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 6px 8px;text-align:center;font-size:12.5px;font-weight:600}
+.mini div.me{border-color:var(--athr)}
+.mini svg{width:70px;height:auto;display:block;margin:0 auto}
+.mini small{display:block;font-weight:400;color:var(--mut);font-size:11.5px}
+
+.report h2{font-size:21px}
+.rows{display:flex;flex-direction:column;margin-top:10px}
+.rows div{display:flex;flex-direction:column;gap:2px;padding:10px 0;border-top:1px solid var(--line)}
+.rows div span:first-child{color:var(--mut);font-size:13px}
+.rows div span:last-child{font-weight:600;font-size:15.5px;white-space:pre-line}
+.cm{position:relative;display:flex;flex-direction:column;gap:6px;background:var(--athrlt);border-radius:14px;padding:10px;counter-increment:cm}
+#cmts{counter-reset:cm}
+.cn::before{content:"تعليق " counter(cm);font-size:12.5px;font-weight:600;color:var(--athrtx)}
+.cm textarea{resize:vertical;font-family:inherit;line-height:1.6;background:var(--card)}
+.cm input{background:var(--card);font-size:14.5px;padding:9px 12px}
+.rm{position:absolute;left:10px;top:8px;border:0;background:none;color:var(--mut);font-size:13px;text-decoration:underline}
+#cmts .cm:only-child .rm{display:none}
+.addc{border:1.5px dashed var(--athr);background:transparent;color:var(--athrtx);border-radius:12px;padding:10px;font-size:15px;font-weight:600}
+.rows div.wait span:last-child{font-weight:400;color:var(--mut);font-size:14px}
+.big{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.big div{background:var(--soft);border-radius:14px;padding:10px;text-align:center}
+.big b{display:block;font-size:26px;font-weight:600;color:var(--teal);font-variant-numeric:tabular-nums}
+.big span{font-size:13px;color:var(--mut)}
+
+.bcard{background:#fdf3f7;color:#4a1a33;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;animation:in .4s ease-out both}
+.bhead{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#a8336a;font-weight:600}
+.bhead .logo{color:#15161A;height:20px}
+.bcard h2{font-size:26px;color:#a8336a}
+.bbody{background:#fff;border:1px solid #f3cfdf;border-radius:16px 16px 40px 40px;overflow:hidden}
+.bstrip{background:#a8336a;color:#fff;text-align:center;font-weight:600;font-size:16px;padding:10px}
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;padding:14px 16px 22px}
+@media (max-width:420px){.bgrid{grid-template-columns:1fr}}
+.bf{display:flex;flex-direction:column;padding:8px 0;border-bottom:1px dotted #f0c3d7;min-width:0}
+.bf span{font-size:13px;color:#c0578a;font-weight:600}
+.bf b{font-size:15.5px;font-weight:600;color:#2b1520;overflow-wrap:anywhere}
+.bfoot{font-size:12.5px;color:#a8336a;text-align:center}
+.outs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.outs button{background:#f5f0e6;border:1px solid #e6dccd;border-radius:14px;padding:10px 8px;text-align:right;color:#3b2a20}
+.outs b{display:block;font-size:14px;font-weight:600;color:#a95f3e;line-height:1.4}
+.outs small{font-size:12px;color:#7a6a5e}
+.home,.colA,.colB{display:flex;flex-direction:column;gap:16px;min-width:0}
+.gfoot{display:flex;align-items:center;gap:12px;padding:6px 2px 8px}
+.avs{display:flex;flex-direction:row}
+.avs i{font-style:normal;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:600;background:var(--card);color:var(--athrtx);border:2px solid var(--sky);margin-left:-8px}
+.avs i:last-child{margin-left:0}
+.prog{flex:1;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--teal);font-weight:600;white-space:nowrap}
+.bar2{flex:1;height:8px;border-radius:9px;background:rgba(12,128,117,.15);overflow:hidden}
+.bar2 i{display:block;height:100%;background:var(--teal);border-radius:9px;transition:width .8s ease-out}
+.next{display:flex;flex-direction:column;gap:2px;border-radius:18px;padding:14px 16px;text-align:right;border:0;width:100%}
+.next span{font-size:13px;font-weight:600;opacity:.85}
+.next b{font-size:19px;font-weight:600}
+.next em{font-style:normal;font-size:13.5px}
+.next.go{background:var(--athrdk);color:#fff;box-shadow:0 8px 20px -10px rgba(168,51,106,.7);transition:transform .15s}
+.next.go:hover{transform:translateY(-2px)}
+.next.go em{align-self:flex-start;background:rgba(255,255,255,.18);padding:2px 12px;border-radius:999px;font-weight:600;margin-top:4px}
+.next.wait{background:var(--card);border:1.5px dashed var(--line)}
+.next.wait em{color:var(--athrtx);font-weight:600}
+.next.ok{background:var(--mintlt);color:var(--teal)}
+.adm{display:flex;flex-direction:column;gap:8px;padding-top:10px;border-top:1px solid var(--line)}
+.adm-h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14.5px}
+.adm-h b{font-weight:600}
+.adm .pill{font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--soft);color:var(--mut);white-space:nowrap}
+.adm .pill.on{background:var(--mintlt);color:var(--teal)}
+.adm-c{display:flex;gap:8px;flex-wrap:wrap}
+.adm-c input{flex:1 1 150px;width:auto;padding:8px 10px;font-size:14.5px}
+.segc{display:flex;background:var(--soft);border-radius:12px;padding:3px;gap:2px;flex:1 1 220px}
+.segc button{flex:1;border:0;background:transparent;border-radius:9px;padding:6px 4px;font-size:13px;color:var(--mut)}
+.segc button[aria-pressed="true"]{background:var(--card);color:var(--fg);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+/* responsive: phone = one column; tablet = wider column; desktop = plant beside the journey */
+@media (min-width:700px){#app{max-width:640px}.title{font-size:28px}.mini div{width:110px}}
+@media (min-width:1000px){
+  #app{max-width:1080px}
+  .screen:not(.wide){max-width:600px;width:100%;margin:0 auto}
+  .home{display:grid;grid-template-columns:minmax(340px,420px) 1fr;gap:28px;align-items:start}
+  .colA{position:sticky;top:16px}
+  .colA .plant{max-width:290px}
+  .st{padding:16px 18px}.st .nm b{font-size:17px}
+  .mini{flex-wrap:wrap;overflow:visible}
+  .row:hover,.st.open:hover,.outs button:hover{transform:translateY(-2px)}
+  .row,.st,.outs button{transition:transform .15s,border-color .15s}
+}
+.home2{display:flex;flex-direction:column;gap:18px}
+.hhead{position:relative;overflow:hidden;background:#a8336a;color:#fff;border-radius:28px;padding:16px 18px 0}
+.hhead .ring{position:absolute;width:280px;height:280px;border-radius:50%;border:36px solid rgba(255,255,255,.07);left:-100px;top:30px;pointer-events:none}
+.ht{display:flex;justify-content:space-between;align-items:center;position:relative;gap:8px}
+.ht .logo{color:#fff}
+.ht .logo path[fill="#64D8AE"]{fill:#64D8AE}
+.ht span{font-size:12px;background:rgba(255,255,255,.16);border-radius:999px;padding:2px 10px;white-space:nowrap}
+.hero2{display:flex;align-items:flex-end;gap:6px;position:relative;margin-top:8px}
+.hero2 .txt{flex:1;min-width:0;padding-bottom:20px}
+.hero2 small{font-size:12.5px;opacity:.85}
+.hero2 h2{font-size:27px;line-height:1.3}
+.pct{display:flex;align-items:baseline;gap:6px;margin-top:6px}
+.pct b{font-size:40px;font-weight:600;line-height:1}
+.pct span{font-size:13px;opacity:.85;white-space:nowrap}
+.hero2 .avs{margin-top:12px}
+.hero2 .avs i{border-color:#a8336a;color:#a8336a}
+.hero2 .plant{width:150px;flex:none;margin:0 0 -4px}
+.stg2{display:inline-block;margin-top:10px;background:#fff;color:#0C8075;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px}
+.hgrid{display:flex;flex-direction:column;gap:18px}
+.road{position:relative;margin:0 4px}
+.road svg{position:absolute;inset:0;width:100%;height:100%}
+.rn{position:absolute;transform:translate(-50%,-31px);display:flex;flex-direction:column;align-items:center;gap:3px;width:150px;border:0;background:none;padding:0;text-align:center}
+.rn .c{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:600;transition:transform .15s}
+.rn:hover .c{transform:translateY(-3px)}
+.rn b{font-size:14px;font-weight:600;line-height:1.35;background:var(--bg);padding:0 6px;border-radius:6px}
+.rn small{font-size:12px;color:var(--mut);background:var(--bg);padding:0 6px;border-radius:6px}
+.rn.done .c{background:var(--teal);color:#fff;box-shadow:0 5px 0 #0a6b62}
+.rn.open .c{background:var(--card);color:var(--athrtx);border:3px solid var(--athr);box-shadow:0 5px 0 var(--roadbg)}
+.rn.now .c{background:var(--athr);color:#fff;width:76px;height:76px;font-size:25px;margin-top:-7px;box-shadow:0 6px 0 #a8336a,0 0 0 9px rgba(217,85,143,.18);animation:bob 2.2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.rn .go{background:#a8336a;color:#fff;font-size:12.5px;font-weight:600;border-radius:999px;padding:2px 12px}
+.rn.lock{cursor:not-allowed}
+.rn.lock .c{background:var(--soft);color:var(--mut);box-shadow:0 5px 0 var(--line)}
+.rn.day:not(.done) .c{background:#f8c86a;color:#7a4e0e;box-shadow:0 5px 0 #d99b2b}
+.rgoal{position:absolute;left:50%;transform:translate(-50%,-30px);display:flex;flex-direction:column;align-items:center}
+.rgoal svg{width:84px;height:auto}
+.rgoal small{font-size:12px;font-weight:600;color:var(--athrtx);background:var(--bg);padding:0 6px;border-radius:6px}
+.outs2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.o2{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:right;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;transition:transform .15s}
+.o2:not(.off):hover{transform:translateY(-2px);border-color:var(--athr)}
+.o2 .ico{width:36px;height:36px;border-radius:12px;background:var(--athrlt);color:var(--athrtx);display:grid;place-items:center;font-size:17px;margin-bottom:6px}
+.o2 b{font-size:14.5px;font-weight:600}
+.o2 small{font-size:12px;color:var(--mut)}
+.o2.off{opacity:.5;cursor:default}
+.ctabar{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:3}
+.btn.cta{box-shadow:0 5px 0 #6e1f45;padding:16px}
+.waitbar{background:var(--card);border:1.5px dashed var(--athr);border-radius:16px;padding:12px 16px;display:flex;flex-direction:column;box-shadow:0 10px 24px -14px rgba(0,0,0,.3)}
+.waitbar b{font-weight:600;font-size:15px}
+.waitbar span{font-size:13px;color:var(--athrtx);font-weight:600}
+@media (min-width:1000px){
+  .hgrid{display:grid;grid-template-columns:1fr minmax(340px,420px);gap:28px;align-items:start}
+  .colB{position:sticky;top:16px}
+  .hero2 .plant{width:200px}.hero2 h2{font-size:34px}
+  .ctabar{max-width:520px;margin:0 auto;width:100%}
+}
+.admin{border:1.5px dashed var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.admin h3{font-size:15px}
+.admin p{font-size:13px;color:var(--mut)}
+.tg{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14.5px}
+.tg button{border:0;border-radius:999px;padding:4px 14px;font-size:13px;font-weight:600;background:var(--soft);color:var(--mut);min-width:74px}
+.tg button.on{background:var(--teal);color:#fff}
+.note{font-size:12.5px;color:var(--mut);text-align:center}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--teal);color:#fff;font-weight:600;padding:10px 18px;border-radius:999px;z-index:9;box-shadow:0 8px 20px -8px rgba(0,0,0,.4)}
+#toast.bad{background:#c0392b}
+.thumbs{display:flex;flex-wrap:wrap;gap:6px}.thumbs a{font-size:13px;background:var(--mintlt);color:var(--teal);padding:4px 10px;border-radius:999px;text-decoration:none;font-weight:600}
+.btn:disabled{opacity:.6}
+@media (prefers-reduced-motion: reduce){*,*::before{animation:none!important;transition:none!important}}
+</style>
+
+<div id="app" dir="rtl"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+(function(){
+const REGIONS=[["SA-01", "m 456.82718,487.03041 -10.13,2.63 -16.39,2.39 -58.85,5.04 -8.85,-0.7 -3.24,-0.72 -5.22,-2.39 -8.51,-5.59 0,0 -13.54,-12.09 -3.91,-6.36 -2.75,-2.96 -0.22,-1.6 1.23,-6.11 3.34,-6.09 0.08,-2.96 -1.06,-1.73 -3.6,-3.6 -3.07,-4.93 -5.76,-5.01 0,0 -4.34,-7.06 -4.77,-6.36 -0.58,-1.47 1.76,-8.48 -0.54,-6.95 2.33,-3.42 0.68,-2.34 -1.79,-13.1 0.96,-6.16 -0.31,-1.57 -6.45,-1.41 -5.65,1.47 -3.7,-1.28 -1.26,-2.3 0.28,-5.34 0.86,-2.93 -1.84,-1.88 -3.09,-0.85 -14.1,-0.63 -3.01,-1.63 -5.15,-11.26 -0.91,-5.64 -2.1,-4.72 -1.13,-4.86 -4.16,-3.3 -0.36,-3.13 0.44,-3.64 0,0 -0.04,-9.03 1.41,-4.88 -0.94,-3.6 2.95,-4.25 0.4,-3.14 0,0 3.04,-5.08 2.17,-1.58 1.5,0.12 5.17,2.55 3.87,0.81 5.73,0.5 5.67,-0.89 5.69,0.87 2.43,-1.79 0.85,-2.18 -1.91,-3.83 0.15,-2.3 5.42,-6.69 3.27,-2.52 12.88,-3.15 2.84,-2.81 3.09,-1.74 2.28,-4.47 2.02,-1.97 3.13,-0.82 8.3,1.06 7.2,-0.68 5.53,0.22 0.84,-3.9 -0.31,-3.16 -2.52,-4.86 1.08,-2.91 -0.14,-0.86 -6.69,-10.16 -3.6,-3.57 -0.49,-1.52 0.84,-5.74 -0.43,-5.12 4.01,-1.1 4.5,-5.87 2.46,-2.11 4.18,-1.84 0.62,-1.48 -0.15,-2.5 -1.34,-2.5 -3.6,-2.99 -2.35,-0.93 0,0 -0.68,-1.88 0.06,-1.59 0.99,-3.1 2.42,-3.32 3.15,-1.64 0,0 1.94,2.12 1.51,0.52 1.8,-0.86 1.3,-2.23 0,0 3.32,2.32 2.12,2.21 1.4,5.11 1.24,1.53 10.41,6.08 5.75,1.06 3.46,4.22 4.06,3.38 2.34,0.63 5.64,0.11 3.01,0.81 9.86,6.94 2.49,1.19 2.36,0.05 4.41,-1.01 1.55,0.22 6.45,6.08 1.47,2.52 8.88,3.16 3.86,2.08 1.09,2.56 0.43,4.96 0.38,22.63 -0.63,15.07 0.35,7.41 0.68,3.7 1.12,1.79 2.28,1.8 9.44,6.3 9.19,9.16 1.68,2.06 2.95,5.78 1.36,6.89 -0.02,7.75 z"], ["SA-02", "m 143.70718,343.80041 0,0 0.12,-0.02 -0.12,0.02 z m 114.74,-19.79 -0.44,3.64 0.36,3.13 4.15,3.3 1.13,4.86 2.11,4.72 0.91,5.64 5.15,11.26 3.01,1.63 14.1,0.63 3.09,0.85 1.84,1.88 -0.85,2.93 -0.29,5.33 1.26,2.31 3.7,1.28 5.65,-1.47 6.45,1.41 0.31,1.57 -0.96,6.17 1.79,13.1 -0.68,2.34 -2.33,3.43 0.55,6.94 -1.76,8.48 0.58,1.47 4.77,6.36 4.34,7.06 0,0 -4.02,1.47 -5.71,3.77 -5.22,-1.3 -2.26,0.25 -3.16,1.52 -4.55,0.28 -4.26,3.81 -6.41,3.06 -10.11,9.24 -2.31,1.14 -2.29,-0.24 -1.4,-1.02 -4.67,-9.07 0,0 -1.98,-1.93 -1.48,-0.22 -5.42,2.76 -4.16,-0.2 -4.61,1.77 -1.91,-1.46 -1.28,-3.77 -1.22,-1.45 -1.43,-0.61 -2.26,0.32 -1.36,1.41 -0.7,2.12 1.11,4.54 -0.12,2.36 -2.69,4.63 -1.37,3.56 -7.73,1.86 -4,4.1 0.17,1.42 0.67,0.7 3.66,1.09 0.97,1.53 -0.31,5.28 0.91,3.89 -0.27,4.44 1.3,1.54 3.69,2.13 2.06,3.06 1.59,1.05 2.59,0 2.21,-1.08 2.58,-8.98 2.4,-4.46 1.52,-0.59 4.61,-0.04 0.79,-0.5 0,0 1.51,-0.74 2.29,0.13 1.85,1.88 0.21,1.52 -1.31,6.92 2.19,4.44 -1.27,4.6 -0.76,1.42 -1.52,0.75 -4.74,-0.43 -2.24,0.37 -3.88,2.82 -0.75,0.06 -1.97,-1.87 -0.49,10 0.61,2.97 1.02,1.48 1.44,0.48 6.71,0.21 2.11,1.21 2.98,9.14 -1.5,6.41 0,0 -1.01,1.94 -3.55,2.05 -1.97,3.15 0,0 -0.4,-1.87 -0.27,-0.33 -0.95,-1.23 0.03,-0.49 -0.32,-0.57 -0.37,-0.37 -0.51,0.76 -0.36,-0.35 0.36,-1.15 -0.46,-0.24 -0.48,-0.65 0.15,-0.87 -0.73,-0.87 -0.54,-2.04 0.05,-0.8 -0.17,-1.41 -0.82,-0.8 0.15,-1.21 -1.41,-1.06 -0.63,-1.3 -2.26,-0.09 -1.06,-0.83 -0.19,-1.62 -1.74,-2.17 1.24,-4.89 -1.56,-0.4 -1.15,-0.92 -1.2,-2.73 1.29,-3 -0.2,-1.69 -3.05,-1.3 -1.11,-2.63 0.38,-1.51 -0.45,-1.44 -0.82,-0.58 -0.56,-1.36 -1.58,-0.81 0.3,-0.43 -0.48,-2.03 0.5,-2.77 -1.22,-1.31 -2.27,-0.56 -2.79,-2.11 -0.28,-1.02 1.04,0.93 0.34,-2.1 -1.13,-3.14 -1.43,-1.64 -2.06,0.57 -1.01,-0.32 0.18,0.78 1.11,0.52 -0.3,0.28 -1.35,-0.84 -0.43,-1.5 -1.42,-0.71 -0.3,-2 -1.3,-0.58 0.42,-1.26 -0.41,-1.12 -5.69,-3.91 -2.98,-0.95 -1.24,-2.03 -0.65,-0.05 0.14,-1.25 -2.29,0.07 -1.45,-1.52 -0.51,-1.48 -1.65,-0.59 -1.89,0.26 0.06,0.51 -0.75,0.13 -2.1,-1.56 -1.14,0.2 1.53,0.77 0.28,0.74 -2.67,-1.27 -5.15,-3.89 -1.76,-1.95 0.58,-0.54 -1.07,-0.75 0.18,-1.07 -0.96,0.31 -0.7,-0.68 -1.01,-1.32 0.23,-0.37 1,0.68 -0.4,-1.17 -0.99,0.09 -1.48,-1.98 -1.64,-3.02 0.52,-0.77 -0.17,-0.74 -1.45,-0.9 -0.15,0.64 0.6,0.97 -0.58,-0.22 -0.8,-2.17 0.89,0.43 0.34,-0.2 -0.53,-0.43 0.29,-0.25 -0.67,-0.12 -0.55,0.19 -2.05,-1.72 0.25,-1.31 -0.84,-0.77 -1.29,-0.07 -1.24,-1.94 0.16,-1.2 -1.32,-2.35 -1.66,-1 -0.89,-4.24 -0.83,-0.7 -1.27,-2.5 0.11,-0.78 0.87,-0.39 1.29,-0.9 0.7,-1.87 -1.22,-1.02 0.13,-0.82 -0.26,-0.74 0.9,-0.1 -0.92,-1.34 0.25,-0.39 -0.59,0 -0.24,0.29 -0.78,-0.67 -0.93,-6.07 -1.43,-3.12 -3.24,-4.23 -0.38,-1.86 0.39,-0.47 -0.51,-1.44 0.59,-0.78 1.37,-0.28 -1.02,1.88 0.52,0.64 0.46,-0.88 0.79,0.17 0.2,-2.75 1.22,0.1 -0.24,-0.86 0.56,-2.21 -0.34,-0.69 -0.56,2.85 -0.58,-0.26 0.8,-1.95 -0.32,-1.47 2.25,-4.19 -0.02,-1.7 0.44,-0.72 0.84,-0.18 0.32,-1.38 -1.17,-0.01 -0.15,0.92 -0.33,-0.19 -0.72,-0.57 0.48,-2.14 -0.1,-3.6 -1.88,-3.15 -0.39,-1.76 -1.17,-1.43 0.89,-0.9 -0.93,-0.07 -0.43,0.31 -4.27,-7.13 1.3,0.49 1.37,2.24 -0.19,0.47 1.19,0.21 0.51,-0.72 -1.58,-2.25 -0.05,-1.49 -2.29,0 0.32,-0.53 -0.89,0.1 -0.26,0.35 -1.44,-2.19 0.74,-1.65 -0.73,-3.8 -0.25,-0.76 -0.68,0.68 -1.68,-2.45 -0.09,-1.34 -0.33,-0.39 -0.23,-0.15 -0.98,-2.23 -0.07,-2.6 0,0 5.12,-0.4 3.08,-0.92 0.82,0.34 2.13,3.42 2.42,1.85 3.42,4.08 1.68,1.3 1.55,0.23 4.88,-1.11 1.58,0.37 0.43,3.86 0.7,0.58 10.44,-3.25 4.76,-0.31 1.07,1.39 0.28,3.25 -2.65,6.93 0.06,0.86 0.59,0.74 3.98,1.18 2.09,1.91 0.45,2.31 -0.83,3.87 0.65,1.58 4.76,0.56 2.33,-1.12 4.63,-4.1 6.79,2.21 1.62,-0.02 4.47,-6.66 9.34,-7.12 5.12,-5.32 2.45,-1.77 5.67,-2.31 0.56,-0.76 -0.4,-1.57 -5.35,-2.94 -0.76,-0.66 -0.2,-1.49 3.59,-2.87 11.75,-5.83 1.06,-1.53 0.69,-2.21 -0.16,-3.22 -1.11,-2.52 0.58,-2.32 3.24,-1.03 5.03,0.65 z"], ["SA-03", "m 130.84718,324.65041 -0.9,-0.61 -0.33,0.61 -0.7,-0.29 -0.33,-0.44 -1.1,-1 0.38,-0.9 -1,0.41 -1.03,-1.53 -1.82,-1.19 0.16,-0.31 -0.62,-0.34 -1.13,0.46 -3.64,-2.84 0.62,-0.51 -0.59,-0.29 0.58,-1.68 -1.39,0.76 0.45,0.38 -0.44,1.27 -1.68,-0.19 -2.75,-2.06 -1.19,-2.11 -0.79,0.16 -0.38,-0.71 -0.69,-0.14 -0.09,-0.83 -1.55,0.6 -1.04,-0.36 -0.08,0.81 0.54,0.16 -0.37,0.91 -1.51,0.05 -0.66,-0.98 -1.17,0.09 -1.82,-2.71 -1.49,-1.07 0.31,-1.82 0.67,0.46 0.26,-1.12 -1.18,-1.47 -0.42,-1.45 -1.040004,-0.88 0,0 0.550004,-3.24 0.95,-1.47 5.65,-0.48 0,0 2.36,-0.91 0,0 0.79,-0.71 0,0 1.17,-1.81 0,0 0.55,-0.71 0,0 1.55,-0.41 2.31,0.45 0,0 2.58,-0.03 1.61,-0.83 0.92,-1.54 0.22,-1.56 0,0 -0.11,-3.18 0,0 -0.22,-10.27 0,0 0.84,-4.77 0,0 0.1,-0.74 0,0 0.25,-2.3 0,0 -1.12,-1.4 0,0 -3.17,-0.13 0,0 -0.74,-0.31 0,0 -1.79,-6.32 0,0 -1.8,-3.88 -3.72,-3.33 0,0 -2.17,-1.85 -0.67,-1.64 0,0 -0.54,-2.27 -0.73,-0.61 0,0 -2.23,-1.15 0,0 -4.010004,-2.52 -1.53,0.17 0,0 -1.95,1.78 -0.28,-1.56 0,0 -0.81,-3.12 -1.69,-3.17 0,0 -0.67,-1.68 0,0 0.16,-2.33 0,0 3.15,-5.54 0.26,-1.76 0,0 -0.36,-1.18 0,0 -1.54,-0.95 0,0 -4.78,-1.35 0,0 -1.6,-1.31 0,0 -1,-1.58 -0.69,-2.63 0.81,-8.93 0,0 -0.99,-4.2 0,0 -1.43,-1.38 0,0 -1.54,-0.18 0,0 -3.12,0.69 0,0 -0.81,-0.48 -0.09,-0.75 1,-1.47 0,0 3.12,-0.69 0,0 1.62,-0.43 0,0 1.67,-0.81 0,0 1.59,-0.57 0,0 3.22,-1.5 0,0 1.64,-1.06 0,0 0.76,-0.34 0,0 1.55,-0.39 0,0 3.96,1.66 0,0 2.360004,1.74 0,0 2.42,0.31 1.73,-0.42 5.85,-3.33 0,0 1.55,-0.46 0,0 0.78,0.31 0,0 1.11,1.52 0,0 0.8,3.16 0,0 0.56,1.68 0,0 2.45,4.27 0,0 1.09,1.55 0,0 0.81,0.56 0,0 1.52,0.26 0,0 5.38,0.24 1,1.24 0,0 -0.2,1.59 0,0 0.15,0.79 1.47,1.04 0,0 2.27,1.42 0,0 0.15,0.75 0,0 -0.43,2.4 0.19,0.75 0.74,0.34 0,0 0.75,-0.01 1.57,-1.19 0,0 1.54,-1.37 0,0 1.69,-1.29 1.65,-0.33 6.16,2.51 0.8,-0.64 -0.52,-1.5 0,0 -0.31,-1.5 0.42,-0.73 0.75,-0.04 0,0 1.28,1.18 0.96,3.08 0,0 2.36,0.83 0,0 2.36,0.58 2.27,1.43 0,0 1.52,1.23 0,0 2.42,1.83 2.26,0.41 0,0 6.57,-0.52 0,0 10.45,-2.02 0,0 1.53,-0.07 0,0 0.77,0.43 0,0 1.22,1.43 0,0 0.56,1.01 0,0 0.68,1.56 0.24,2.66 -0.75,2.42 -1.62,2.25 0,1.63 1.18,1.5 0.77,0.24 3.27,-0.84 0.73,0.25 0.36,0.79 -0.11,4.16 -1.9,10.91 2.08,9.8 -0.52,10.14 0.63,1.61 1.3,1.49 1.56,0.71 1.55,0.03 9.37,-3.24 8.06,-0.39 2.41,-1.18 3.87,-4.64 3.27,-1.25 6.68,-0.15 11.8,2.31 0,0 6.92,1.83 1.35,1.16 0.28,1.98 -0.57,11.32 1.74,2.02 5.3,1.39 1.41,1.13 3.15,10.79 4.08,3.38 0,0 -0.4,3.14 -2.95,4.25 0.94,3.6 -1.41,4.88 0.04,9.03 0,0 -5.05,-0.85 -3.23,1.03 -0.58,2.32 1.11,2.52 0.16,3.23 -0.69,2.21 -1.06,1.53 -11.75,5.84 -3.59,2.87 0.2,1.49 0.76,0.66 5.35,2.94 0.4,1.57 -0.56,0.76 -5.67,2.31 -2.45,1.77 -5.12,5.33 -9.34,7.12 -4.47,6.66 -1.62,0.02 -6.79,-2.21 -4.63,4.1 -2.33,1.12 -4.76,-0.56 -0.65,-1.58 0.83,-3.86 -0.45,-2.31 -2.09,-1.91 -3.98,-1.18 -0.59,-0.74 -0.06,-0.86 2.65,-6.92 -0.28,-3.25 -1.07,-1.39 -4.76,0.31 -10.44,3.25 -0.7,-0.58 -0.43,-3.86 -1.58,-0.37 -4.88,1.11 -1.55,-0.23 -1.67,-1.3 -3.42,-4.08 -2.42,-1.84 -2.12,-3.42 -0.82,-0.34 -3.08,0.92 -5.12,0.4 0,0 -0.21,0.03 0,0 -0.12,0.02 0,0 -0.64,-3.24 -1.32,-1.32 0.21,-1.05 -0.97,0.4 -0.65,-0.35 -0.13,0.75 0.84,0.4 -0.37,0.4 -0.86,-0.5 0.1,-1.51 -0.57,-1.35 0.13,-0.52 -0.78,-0.4 -0.7,-0.82 -0.95,-2.79 -0.01,-1.63 -1.02,-1.12 -0.92,-0.09 -0.87,-1.56 -2.41,-1.65 -0.58,-1.03 -0.44,-0.28 z"], ["SA-04", "m 545.08718,262.60041 1.22,0.53 0.35,2.07 -0.6,-1.32 -1.01,-0.6 0.04,-0.68 z m -8.35,-39.01 0.87,0.69 -0.05,1.6 -1.18,-1.16 -1.01,-0.12 0.21,-0.65 1.16,-0.36 z m -18.37,-29.14 1.75,1.05 4.11,1.08 -1.87,0.05 -0.52,-0.26 -2.37,0.75 -0.45,-0.6 0.45,-0.25 -0.11,-0.49 -1.17,-0.55 -2.13,2.34 0.34,0.57 -0.4,-0.13 -0.22,-0.78 0.55,-1.55 0.7,-0.87 1.34,-0.36 z m 19.57,33.55 0.38,0.99 0.46,-1.63 0.45,0.11 -0.06,2.39 0.79,0.44 1.19,-1.76 -0.36,-0.33 0.38,-1.81 0.25,0.39 0.12,1.06 0.38,-0.61 0.05,1.18 -0.98,0.58 0.08,1.05 -0.63,0.11 1.65,1.52 0.52,1.62 -0.54,4.1 0.45,0.68 -0.36,0.03 -0.1,1.48 -1,1.13 0.19,-0.78 -0.87,-1.22 -0.16,2.24 0.42,0.52 -0.83,2.12 0.19,1.3 -0.75,0.42 -2.62,-5.96 -0.76,-0.54 -0.52,0.32 -1.15,2.79 0.89,1.29 -0.52,0.67 0.04,3.02 0.61,0.16 0.8,-0.92 0.81,0.74 1.37,0.1 0.5,0.75 -0.15,0.79 0.63,0.57 -0.69,0.16 -0.37,1.04 1.28,2.91 1.81,2.68 1.09,0.66 0.7,2.02 0.75,0.4 -0.23,0.88 -0.41,0.18 -0.4,-1.47 -1.42,-0.33 -1,-1.47 -0.55,0.17 -0.47,-0.58 0.68,1.74 1.09,0.76 0.05,0.56 0.51,-0.72 0.22,0.28 0.24,1.8 1.28,1.16 0.67,1.46 1.26,0.44 0.07,1.1 2.04,2.54 0.4,0.04 -0.05,-1.1 -0.68,-0.91 0.66,-0.53 0.62,1.64 3.23,2.49 1.33,4.04 -0.34,2.41 1.25,2.03 -0.41,1.78 0.83,2.56 -0.27,0.88 0.89,0.45 -0.5,-0.65 0.32,-0.82 2.52,3.53 1.05,3.3 0.95,0.04 0.54,0.69 1.49,6.53 0.64,-1.84 1.58,-0.3 -0.25,0.48 1.08,2.13 3.69,4.38 4.58,0.8 2.45,-0.96 1.63,-1.8 1.16,0.39 1,-0.33 -0.1,0.51 0.6,0.44 0.76,-0.35 -0.66,1.28 0.13,2.42 1.45,-0.87 0.37,-1.39 1.6,-1.3 -0.09,-0.95 0.89,0.53 0.53,-0.43 0.41,1.64 1.03,-0.58 0.76,0.76 -0.62,0.64 -1.21,0.07 -0.54,0.95 -0.44,-0.16 -0.42,1.48 -3.07,2.44 -0.6,3.09 -0.56,0.13 0.13,1.7 2.24,0.42 0.9,-1.18 2.03,-0.18 1.67,0.66 1.51,2.12 1.63,-0.07 0.75,1.18 -0.51,4.23 34.3,41.63 23.79,4.76 59.71,13.76 7.05,-7.46 15.68,25.98 -22.97,73.24 -103.4,36.4 -39.96,7.94 -57.87,6.31 -32.09,15.68 -20.91,25.6 -4.87,12.21 -1.53,0.93 0,0 2.59,-24.45 7.99,-63.49 0,0 19.5,-152.83 0.02,-7.75 -1.36,-6.9 -2.96,-5.78 -1.67,-2.06 -9.19,-9.15 -9.44,-6.3 -2.29,-1.8 -1.12,-1.79 -0.68,-3.7 -0.34,-7.4 0.63,-15.07 -0.38,-22.62 -0.43,-4.96 -1.09,-2.56 -3.86,-2.08 -8.88,-3.17 -1.46,-2.52 -6.45,-6.08 -1.55,-0.22 -4.41,1.01 -2.35,-0.04 -2.5,-1.19 -9.86,-6.94 -3.01,-0.81 -5.64,-0.11 -2.35,-0.63 -4.06,-3.38 -3.46,-4.22 -5.74,-1.06 -10.41,-6.08 -1.23,-1.53 -1.41,-5.11 -2.12,-2.21 -3.32,-2.32 0,0 -1.47,-1.82 -0.38,-1.53 1.28,-4.67 9.15,-12.15 12.66,-23.67 8.26,-8.72 12.45,-4.39 0,0 5.1,0.13 2.64,-1.27 4.09,-3.16 31.35,4.11 0.87,0.67 3.36,5.38 0.61,2.55 0.22,4.61 3.53,4.7 -0.17,0.7 24.98,-0.43 1.18,1.14 1.28,0.47 -0.04,2.25 0.84,0.66 -0.18,0.34 0.85,0.15 -1.01,3.01 0.97,1.98 1.47,1.03 1.7,2.23 -0.69,0.53 -0.18,2.67 0.39,1 2.05,2.38 3.89,1.05 -0.77,0.92 -0.84,-0.08 0.08,1.05 1.59,1.81 1,0.1 0.05,1.35 2.03,1.26 -0.36,2.1 0.46,0.44 -0.08,0.47 -0.9,0.6 0,-0.89 -0.55,-0.04 0.29,-2 -0.72,1.02 -0.29,-1.41 -1.3,4.4 0.64,0.08 0.45,-1.25 0.35,2.38 0.64,-0.95 0.42,0.68 -0.34,1.18 1.07,-0.31 -0.32,0.58 -0.52,0.11 -0.05,0.82 -0.32,0.69 1.12,0.54 0.75,-1.32 0.63,0.19 -0.57,1.04 0.11,1.29 0.81,-0.41 -0.1,-1.04 1.56,-0.79 0.94,0.37 1.08,1.57 2.59,1.16 3.66,-0.06 1.69,0.83 0.61,1.33 1.12,0.63 0.2,1.82 -0.56,-0.15 0.25,-0.69 -0.36,-0.54 -0.71,1.15 -0.54,-0.61 -0.71,0.71 -0.75,-0.72 -0.74,0.47 -0.31,-0.45 -0.69,0.92 -0.82,-0.34 -0.33,0.73 0.41,-0.21 1.54,0.94 0.56,0.71 1.01,-0.24 -0.03,-1.05 1.36,0.77 -0.61,0.76 -0.73,0.07 0.32,0.92 -0.67,1.23 1.72,-1.09 1.62,0.54 -0.01,3.71 0.67,1.13 0.54,0.02 0.42,-0.06 0.53,-0.23 1.14,0.57 -0.48,1.89 -0.65,-0.23 -0.44,0.41 0.51,0.01 -0.2,0.56 0.76,-0.31 0.53,1.03 0.67,-1.73 0.5,0.35 -0.15,1.06 1.2,-0.66 1.46,0.51 -0.89,-1.68 1.27,-1.31 -1.73,-1.58 -0.68,0.08 0.65,-1.04 -0.21,-0.53 0.74,-0.47 0.46,1.97 1.11,0.06 0.23,1.5 -0.74,0.31 0.97,0.96 0.9,-0.7 0.59,-2.69 0.97,-1.31 -0.99,2.95 -0.44,1.56 -0.63,0.96 0.55,1.96 1.17,1.16 2.4,-1.43 1.07,0.41 -0.03,0.09 -0.49,-0.01 -0.09,0.04 -0.27,0.47 -0.27,-0.47 -2.28,1.16 0.96,1.23 1.49,-0.36 -0.16,0.73 -0.56,0.02 0.02,1.19 0.71,0.03 0.24,0.85 0.13,0.2 2.3,1.81 0.37,0.11 1.21,0.73 1.13,0.37 0.79,0.61 2.98,0.3 2.07,2.21 4.49,5.29 0.49,0.45 0.41,0.4 -0.59,0.09 -1.3,-1.73 -1.68,-0.43 -0.98,0.68 -1.23,-1.95 -0.06,-0.88 -0.47,2.24 0.15,0.95 0.81,0.2 -0.35,1.09 0.31,2.66 0.93,2.33 1.41,1.84 0.1,-1.15 0.31,-0.31 z"], ["SA-05", "m 238.57718,264.11041 1.2,-1.37 4.95,-0.74 6,-3.57 5.95,-0.77 0.81,-0.65 0.05,-0.82 -2.4,-4.78 0.32,-2.44 1.26,-1.51 0.86,-0.19 3.95,1.42 2.43,0.25 0.47,-0.77 -0.82,-6.33 1.89,-4.8 0.77,-0.41 1.6,0.52 3.32,-0.78 0.87,-4.3 4.75,-4.83 11.89,-9.24 11.31,-5.23 2.76,-5.79 2.72,-2.76 14.5,-7.43 4.15,-1.34 2.37,0.86 4.44,4.49 5.99,4.12 7.47,0.54 5.05,-5.84 0,0 2.35,0.93 3.6,2.99 1.34,2.5 0.15,2.5 -0.62,1.48 -4.18,1.84 -2.46,2.11 -4.5,5.87 -4.01,1.1 0.43,5.12 -0.84,5.74 0.49,1.52 3.6,3.57 6.69,10.16 0.14,0.86 -1.08,2.91 2.52,4.86 0.31,3.16 -0.84,3.9 -5.53,-0.22 -7.2,0.68 -8.3,-1.06 -3.13,0.82 -2.02,1.97 -2.28,4.47 -3.09,1.74 -2.84,2.81 -12.88,3.15 -3.27,2.52 -5.42,6.69 -0.15,2.3 1.91,3.83 -0.85,2.18 -2.43,1.79 -5.69,-0.87 -5.67,0.89 -5.73,-0.5 -3.87,-0.81 -5.17,-2.55 -1.5,-0.12 -2.17,1.58 -3.04,5.08 0,0 -4.08,-3.38 -3.15,-10.8 -1.4,-1.13 -5.31,-1.39 -1.74,-2.01 0.58,-11.32 -0.28,-1.98 -1.35,-1.16 z"], ["SA-06", "m 183.65718,221.36041 1.99,-2.39 2.34,-7.76 3.13,-3.74 0,0 4.44,-4.13 0.29,-2.41 0,0 -0.36,-0.76 0,0 -2.95,-1.84 0,0 -0.82,-0.36 0,0 -3.73,-2.16 -1.4,-3.91 0,0 -0.14,-0.92 0,0 -0.39,-1.63 0,0 -2.24,-9.37 -1.05,-2.51 0,0 -1.4,-1.64 -2.37,-0.99 0,0 -0.77,-0.46 -1.33,-2.43 -0.75,-0.31 0,0 -2.31,-0.67 0,0 -1.3,-1.59 0,0 -2.94,-2.27 -4.95,-1.3 0,0 -1.54,-0.24 0,0 -4.08,-0.72 0,0 -2.36,-0.52 -1.13,-1.33 0,0 3.69,-4.2 6.27,-3.54 9.93,-4.38 4.29,-0.69 13.07,-7.6 12.9,-5.53 3.04,0.66 0,0 4.38,1.9 2.37,0.37 20.96,-4.87 12.17,3.53 4.76,-1.35 4.45,-0.36 14.47,3.51 2.37,1.99 4.2,5.16 2.52,1.46 3.99,-0.21 4.62,-2.48 2.68,-0.47 0.67,0.8 0.88,6.22 1.42,1.46 0.96,0.31 6.49,-0.31 6,3.12 2.52,-0.84 5.05,-3.38 1.57,-0.21 1.58,1.23 1.08,1.62 5.28,9.66 2.78,7.7 2.02,2.48 2.44,1.44 9.98,1.29 3.28,1.26 1.62,0.95 6.08,5.52 1.03,1.87 0,0 -3.15,1.64 -2.42,3.32 -0.99,3.1 -0.06,1.59 0.68,1.88 0,0 -5.05,5.84 -7.47,-0.54 -5.99,-4.12 -4.44,-4.49 -2.37,-0.86 -4.15,1.34 -14.5,7.43 -2.72,2.76 -2.76,5.79 -11.31,5.23 -11.89,9.24 -4.75,4.83 -0.87,4.3 -3.32,0.78 -1.6,-0.52 -0.77,0.41 -1.89,4.8 0.82,6.33 -0.47,0.77 -2.43,-0.25 -3.95,-1.42 -0.86,0.19 -1.26,1.51 -0.32,2.44 2.4,4.78 -0.05,0.82 -0.81,0.65 -5.95,0.77 -6,3.57 -4.95,0.74 -1.2,1.37 0,0 -11.8,-2.31 -6.69,0.15 -3.27,1.25 -3.87,4.64 -2.41,1.18 -8.06,0.39 -9.37,3.24 -1.55,-0.03 -1.56,-0.7 -1.3,-1.49 -0.63,-1.61 0.51,-10.14 -2.07,-9.81 1.9,-10.9 0.12,-4.16 -0.37,-0.79 -0.73,-0.24 -3.27,0.83 -0.76,-0.24 -1.18,-1.5 0,-1.62 1.62,-2.26 0.74,-2.41 -0.24,-2.66 z"], ["SA-07", "m 89.197176,284.95041 1.2,0.84 0,0.66 -1.49,-0.68 0.29,-0.82 z m -7.94,-17.27 0.92,0.6 0.42,-0.21 0.96,2.68 -0.7,0 0.08,-1.17 -2.04,-1.11 0.36,-0.79 z m 4.56,-1.3 0.65,0.16 0.38,1.27 0.55,-0.18 -0.26,0.83 -0.21,-0.47 -1.25,0.04 0.41,-1.09 -0.67,-0.43 0.4,-0.13 z m -0.81,-1.47 0.9,0.87 -1.33,-0.1 0.43,-0.77 z m -3.62,-2.17 0.56,0.93 -0.85,0.56 -0.43,-0.67 0.72,-0.82 z m 2.01,-0.4 0.94,2.34 -1.03,-0.85 0.09,-1.49 z m 0.41,-0.85 0.41,0.44 -0.26,0.62 -0.63,-0.79 0.48,-0.27 z m -14.24,-2.19 1.39,1.61 -1.55,0.1 -0.63,-1.01 0.79,-0.7 z m 2.62,-1.99 0.67,0.53 -0.74,0.07 -1.33,-1.36 -0.02,-1.67 0.47,1.79 1.05,-0.63 -0.1,1.27 z m -65.0999998,-86.2 0.88,0.19 0.6,1.53 -1.02,0.43 -0.73,-1.53 -0.45,0.03 -0.06,0.82 -0.6,-0.11 0.24,-0.9 1.14,-0.46 z m -5.35,-2.13 0.48,0.71 -1.23,0.49 -0.45,-0.32 0.02,0.38 1.1,0.84 1.93,-0.34 -0.1,0.81 1.17,1.07 -2.38,0.35 -1.67,-1.25 -0.33,-2.16 1.46,-0.58 z m 47.9399998,-37.38 5.08,1.55 0,0 2.51,1.93 1.99,2.37 0,0 1.17,1.64 0,0 6.23,8.13 0,0 1.72,0.64 1.81,-0.32 0,0 3.28,-1.38 4.39,-1.03 0,0 4.46,-0.83 0,0 5.16,0.72 4.62,1.8 8.550004,0.72 0,0 1.57,-0.57 0,0 2.58,-6.05 0,0 1.26,-1.48 0,0 1.58,-0.72 0,0 2.87,-2.88 0,0 0.77,-0.41 1.57,0.95 0,0 0.46,1.64 0,0 -0.45,7.19 0.31,4.39 0,0 0.57,2.64 0,0 0.75,1.64 0,0 3.48,3.55 2.42,1.21 0,0 3.31,1.1 0,0 10.14,1.18 0,0 2.4,-1.75 0.79,-0.04 0,0 1.54,1.26 0,0 0.78,0.47 0,0 1.64,-0.31 0,0 0.75,0.21 0.79,2.47 1.29,1.08 0,0 1.73,-0.09 3.56,-1.88 0,0 3.39,-0.99 1.64,0.49 1.4,1.22 0,0 1.13,1.32 2.36,0.52 0,0 4.08,0.72 0,0 1.54,0.24 0,0 4.95,1.31 2.94,2.27 0,0 1.3,1.6 0,0 2.31,0.67 0,0 0.75,0.31 1.33,2.42 0.78,0.46 0,0 2.36,0.99 1.41,1.64 0,0 1.04,2.51 2.24,9.37 0,0 0.39,1.63 0,0 0.14,0.92 0,0 1.4,3.91 3.73,2.15 0,0 0.81,0.36 0,0 2.96,1.84 0,0 0.35,0.76 0,0 -0.29,2.41 -4.44,4.13 0,0 -3.13,3.74 -2.33,7.77 -1.99,2.39 0,0 -0.56,-1.01 0,0 -1.22,-1.43 0,0 -0.77,-0.43 0,0 -1.53,0.08 0,0 -10.45,2.03 0,0 -6.57,0.52 0,0 -2.26,-0.4 -2.42,-1.83 0,0 -1.52,-1.23 0,0 -2.27,-1.43 -2.36,-0.58 0,0 -2.35,-0.83 0,0 -0.96,-3.08 -1.28,-1.17 0,0 -0.75,0.04 -0.42,0.73 0.31,1.51 0,0 0.52,1.5 -0.8,0.64 -6.15,-2.51 -1.65,0.33 -1.68,1.29 0,0 -1.54,1.37 0,0 -1.57,1.19 -0.75,0.01 0,0 -0.74,-0.34 -0.19,-0.75 0.43,-2.4 0,0 -0.15,-0.75 0,0 -2.27,-1.42 0,0 -1.47,-1.04 -0.15,-0.79 0,0 0.2,-1.59 0,0 -1,-1.24 -5.38,-0.23 0,0 -1.52,-0.26 0,0 -0.81,-0.56 0,0 -1.09,-1.55 0,0 -2.45,-4.27 0,0 -0.56,-1.68 0,0 -0.8,-3.16 0,0 -1.11,-1.52 0,0 -0.77,-0.31 0,0 -1.55,0.46 0,0 -5.85,3.33 -1.73,0.42 -2.42,-0.31 0,0 -2.350004,-1.74 0,0 -3.96,-1.66 0,0 -1.55,0.39 0,0 -0.76,0.34 0,0 -1.64,1.06 0,0 -3.22,1.5 0,0 -1.59,0.57 0,0 -1.67,0.81 0,0 -1.62,0.43 0,0 -3.12,0.69 0,0 -1,1.47 0.09,0.75 0.81,0.48 0,0 3.12,-0.68 0,0 1.54,0.18 0,0 1.43,1.38 0,0 0.99,4.2 0,0 -0.81,8.93 0.69,2.63 1,1.58 0,0 1.6,1.31 0,0 4.78,1.35 0,0 1.54,0.95 0,0 0.36,1.18 0,0 -0.26,1.76 -3.15,5.54 0,0 -0.16,2.33 0,0 0.67,1.68 0,0 1.69,3.17 0.81,3.12 0,0 0.28,1.56 1.95,-1.78 0,0 1.53,-0.17 4.010004,2.52 0,0 2.23,1.16 0,0 0.73,0.62 0.54,2.27 0,0 0.67,1.64 2.17,1.85 0,0 3.72,3.33 1.8,3.88 0,0 1.79,6.32 0,0 0.74,0.31 0,0 3.17,0.13 0,0 1.12,1.4 0,0 -0.25,2.3 0,0 -0.1,0.74 0,0 -0.84,4.77 0,0 0.22,10.27 0,0 0.12,3.18 0,0 -0.22,1.56 -0.92,1.54 -1.61,0.83 -2.58,0.03 0,0 -2.31,-0.45 -1.55,0.41 0,0 -0.55,0.71 0,0 -1.17,1.81 0,0 -0.79,0.71 0,0 -2.36,0.91 0,0 -5.65,0.48 -0.95,1.47 -0.550004,3.24 0,0 -1.62,-2.9 0.14,-0.69 -0.84,0.33 -0.56,-1.64 -2.78,-1.51 0.33,-0.45 -0.77,-1.66 0.84,0.07 -0.05,-1.24 -0.92,-0.35 0.42,0.41 -0.78,0.58 -1.33,-1.78 0.74,-0.6 1.35,0.3 -0.89,0.44 1.2,0.37 0.35,-1.18 1.15,-0.94 -0.69,-1.49 1.33,-3.11 -1.45,-2.83 0.79,-1.46 -0.59,-2.62 -4.67,-5.22 -1.37,-3.49 0.09,-1.57 -2.7,-2.19 0.04,-1.78 -0.93,-0.25 -0.22,-2.07 -1.07,-1.57 -2.11,-0.91 -2.23,-3.18 -0.39,0.01 0.53,1.51 -0.37,0.18 -0.61,-0.06 -0.53,-0.89 -0.9,-0.06 -1.1,-0.86 0.18,-1.06 -0.49,0.39 -0.45,-0.52 -0.58,-1.92 -0.96,-0.3 1.62,-2.56 0.64,-2.31 -0.24,-1.94 -1.79,-1.12 -2.77,-0.16 -0.28,-0.17 -2.35,-1.96 -1.09,-3.69 -3.07,-4.99 -2.17,-5.7 -2.64,-4.47 -2.02,-2.17 -1.02,-1.98 -1.75,-0.97 -1.79,-4.21 -0.16,-1.73 -3.01,-3.32 -1.93,-1.1 -0.29,-0.81 -3.08,-3.08 -0.43,-2.1 1.01,-1.06 -0.31,-1.15 -2.3,-3.78 -2.56,-1.31 -2.59,-2.96 -0.18,-1.36 -1.79,-2.4 -0.4,-3.1 -1.48,-1.89 -0.38,-1.99 -1.02,-1.86 -0.85,-0.86 -1.85,-0.56 -0.19,-2.51 -2.49,-2 -0.65,-1.62 -3.32,-1.72 -0.19,-0.58 2.18,-0.65 -0.07,-0.59 -2,-0.36 -0.68,-0.59 -1.3,0.06 -1.7,-1.66 -0.56,0.22 -0.9,-0.6 0,0.26 0.51,0.81 -1.1,-0.65 -2.4,1.32 -2.25,-0.17 -0.53,0.41 -0.23,-0.96 1.02,-0.56 -1.66,0.11 -0.58,1.35 -0.27,-0.42 0.64,-1.12 -0.56,0.08 -0.54,0.73 -1.0199998,-0.16 0.44,1.27 -0.96,0.02 0.44,-1.68 -1.35,-0.19 0.32,-0.33 -0.44,-0.83 -0.25,0.49 -0.72,-0.3 -1.13,1.56 0.59,1.1 -0.68,0.14 -0.71,1.44 -0.78,-1.45 0.2,-1.28 -0.53,-0.22 -0.75,0.5 0.01,-0.79 1.96,-2.53 0.97,0.36 -0.42,-1.04 0.6,-0.43 0.76,-2.54 -0.34,-0.08 3.31,-8.17 1.1499998,-1.73 -0.27,-3.51 -0.7699998,-1.93 1.9199998,-5.76 0.03,-2.95 0,0 3.23,0.16 1.64,-0.61 2.49,0.78 0,0 5.25,0.69 0,0 1.92,-0.12 2.31,-2.25 0,0 3.26,-0.84 0,0 6.03,-1.09 0,0 2.35,0.22 0,0 3.31,-0.69 0,0 3.38,-0.17 0,0 2.61,0.51 z"], ["SA-08", "m 403.89718,130.68041 -12.46,4.39 -8.25,8.72 -12.66,23.68 -9.15,12.15 -1.29,4.67 0.39,1.52 1.47,1.83 0,0 -1.3,2.23 -1.8,0.86 -1.51,-0.52 -1.94,-2.12 0,0 -1.03,-1.87 -6.08,-5.52 -1.62,-0.95 -3.28,-1.26 -9.98,-1.29 -2.44,-1.44 -2.02,-2.48 -2.78,-7.7 -5.28,-9.66 -1.08,-1.62 -1.58,-1.23 -1.57,0.21 -5.05,3.38 -2.52,0.84 -6,-3.12 -6.49,0.31 -0.96,-0.31 -1.42,-1.46 -0.88,-6.22 -0.67,-0.8 -2.68,0.47 -4.62,2.48 -3.99,0.21 -2.52,-1.46 -4.2,-5.16 -2.37,-1.99 -14.47,-3.51 -4.45,0.36 -4.76,1.35 -12.17,-3.53 -20.96,4.87 -2.37,-0.37 -4.38,-1.9 0,0 5.62,-5.69 0.89,-6.06 0.39,-9.36 1.4,-2.47 6.16,-4.72 27.27,-16.849995 5.26,-4.73 -0.1,-1.57 -7.78,-6.26 -3.13,-6.39 -2.09,-2.5 -3.6,-1.59 -5.45,0.04 -3.23,-0.65 -7.57,-6.08 -2.7,-1.26 -7.01,0.88 -17.95,-0.62 -3.7,-1.12 -3.98,-3.44 -1.78,-0.77 -4.38,-0.08 -19.01,-3.45 -8.05,0.14 -7.25,1.36 -13.58,1.49 -3.42,-0.04 -2.31,-0.62 -2.19,-1.9 -3.89,-6.96 -4.7,-3.69 -0.58,-6.72 2.84,-8.34 1.27,-6.06 0,0 35.03,-10.31 10.52,-9.1700004 -0.45,-2.01 1.16,1.54 2.33,1.41 18.56,5.42 6.07,2.8400004 3.42,2.31 88.69,62.66 66.05,45.649995 7,1.62 z"], ["SA-09", "m 260.53718,593.84041 0.42,0.19 0.18,-0.09 0.34,0.26 -0.65,1.12 -0.68,-0.76 0.39,-0.72 z m -0.48,-3.22 0.36,0.53 -0.42,1.5 -0.08,-0.96 -0.49,0.77 -0.56,-1.17 0.35,-0.56 0.84,-0.11 z m -6.48,-0.49 1.42,1.06 -0.8,-0.19 -0.62,-0.87 z m -3.48,-2.47 1.93,0.5 1.13,1.63 -3.2,-1.03 -0.65,-0.76 0.79,-0.34 z m 9.66,-3.75 0.49,0.34 -1.62,0.14 1.13,-0.48 z m -9.18,-1.81 3.17,1.84 1.47,3.11 2.35,0.67 1.59,-0.36 0.99,1.34 1.6,-0.47 -0.28,-0.9 -0.44,-0.07 0.28,0.62 -0.84,0.04 -0.43,-0.61 0.52,-0.58 0.1,-1.28 0.59,0.1 0.18,-0.63 0.86,0.1 0.21,1.43 0.76,1.02 0.42,-0.08 0.59,1 0.91,-0.21 0.03,0.51 0.47,-0.06 -0.08,0.94 -0.62,0.65 0.44,2.97 -0.93,0.11 -1.24,-1.42 -1.81,-0.37 1.24,-0.6 -0.09,-1.26 -1.8,-0.44 -3.04,0.93 -1.97,-1.64 -1.14,-0.32 -1.19,-1.03 -0.96,-1.9 -1.33,-0.03 0.46,-1.25 -1,-0.81 -0.04,-1.06 z m -6.47,-0.16 2.05,3.05 -1.59,-0.6 0.21,-0.33 -0.75,-0.69 0.08,-1.43 z m 11.93,-2.08 1.14,0.78 -0.56,0.94 0.58,0.92 1.38,0.42 -0.13,0.87 -1.3,-0.32 -0.74,0.59 2.19,1.66 0.74,1.04 -0.28,0.45 -0.76,-1.15 -3.02,-1 -1.83,-2.61 0.01,-1.08 1.64,-0.2 0.94,-1.31 z m -8.03,-0.22 1.51,1.1 -0.69,1.16 -1,0.31 -0.94,-1.16 1.12,-1.41 z m 3.62,-0.86 1.13,0.65 -0.47,0.57 -0.44,-0.06 -0.22,-1.16 z m 5.16,0.24 0.42,1.41 -2.06,-2.08 1.64,0.67 z m -5.78,-47.93 4.46,-0.47 1.26,1.03 -0.82,7.27 0.28,1.5 0.74,0.47 2.95,-0.45 2.15,0.23 1.08,1.35 0.85,2.89 0.73,0.64 8.28,0.4 1.28,1.24 1.59,3.73 3.25,3.17 1.52,0.63 1.41,-0.14 0.56,-0.66 1.67,-6.75 1.21,-2.1 2.87,-2.16 2.21,-0.88 1,1.12 -0.13,4.42 3.6,1.82 2.64,4.64 0.69,0.57 2.95,0.6 1.98,3.01 0,0 0.97,1.39 -1.92,2.92 0.09,2.37 1.55,0.9 0,0.65 0.81,0.35 0.26,0.69 -4.49,1.41 0.42,1.87 -1.52,1.37 0.05,1.45 -0.62,0.32 -0.06,0.88 0.09,0.35 0.98,-0.4 1.63,0.48 0.82,1.64 -0.55,0.91 -2.27,-0.26 0.26,2.81 -1.5,0.7 -0.04,0.6 1.45,1.89 1.55,0.34 0.33,0.83 1.01,0.48 -0.22,1.26 0.48,0.86 -1.43,0.11 -0.32,0.81 0.49,2.6 -0.84,0.15 -2.07,-1.11 -0.66,0.18 0.44,0.9 -1.03,2.74 0.05,1.06 -4.42,1.16 -1.67,1.19 0.42,2.71 -1.71,0.38 -4.82,-0.49 -0.34,-0.69 0.6,-1.77 -1.21,-1.16 -0.84,-2.21 0.56,-3.56 -0.33,-0.29 -0.47,-0.6 0,-0.93 0.01,-0.57 -2.51,-3.11 -1.41,-0.69 -0.64,0.25 -0.39,-1.35 -0.51,-0.19 -0.69,-0.31 1.07,-0.96 -0.53,-1.39 0.31,-1.85 -1.37,-1.12 -2.17,-0.67 -1.33,-1.88 0.23,-1.83 -0.46,-0.18 -1.12,-0.67 -0.26,0.3 1.13,1.95 -0.66,0.66 0.05,1.98 -0.3,0.95 -0.18,-3.73 -0.98,-3.19 -0.53,-4.16 -0.56,-0.31 0.66,-2.11 -0.29,-1.63 -1.44,-0.38 -1.57,-2.47 -1.97,-1.51 -0.98,0.05 -0.2,-1.49 -0.79,-0.94 -7.32,-5.21 -0.65,-1.03 -1.45,-0.33 -1.24,-1.02 -1.05,-0.03 0.19,-0.8 -3.78,-3.48 0.69,-0.01 -1.01,-0.91 0.26,-1.07 -0.59,0.79 -0.49,-0.33 -0.12,-0.55 0.59,-0.18 -0.22,-1.01 -1.39,-0.54 -0.76,-1.79 0,0 1.97,-3.15 3.55,-2.05 0.98,-2.11 z"], ["SA-10", "m 399.93718,569.40041 -17.23,-2.36 -6.25,-0.42 -6.25,-4.03 -19.73,0 -1.39,0.98 -1.95,0.27 -2.64,-1.39 -2.7,0.12 -8.79,1.12 -0.82,1.52 -1.08,-1.34 -2.95,0.53 -1.37,1.92 -2.61,-0.72 -1.6,0.43 -1.97,-0.29 -0.68,-0.89 -2.02,0.36 -2.59,-2.7 0.07,-1.04 0,0 1.15,-3.24 -1.3,-5.93 0.67,-1.47 0.77,-8.37 -1.38,-6.12 0.08,-1.66 0.88,-1.69 3.08,-3.43 8.21,-7.56 1.08,-1.48 1.06,-3.02 0.95,-1.05 6.32,-2.02 2.38,-1.42 1.22,-1.41 0.97,-2.22 0.17,-2.12 -1.76,-8.57 0.69,-1.59 3.85,-1.94 1.12,-1.39 0.04,-6.08 0,0 8.51,5.59 5.22,2.39 3.24,0.72 8.85,0.7 58.85,-5.04 16.39,-2.39 10.13,-2.63 0,0 -7.99,63.49 -2.59,24.45 0,0 -7.48,4.72 -7.03,-0.36 -8.18,-11.04 -10.7,1.53 z"], ["SA-11", "m 260.01718,447.12041 -2.15,6.42 0.23,0.79 2.05,1.97 0.11,1.59 -1.04,1.45 -5.82,3.97 -0.84,1.79 0.23,3.55 -4.26,8.69 0,0 -0.79,0.51 -4.62,0.04 -1.52,0.58 -2.4,4.46 -2.58,8.99 -2.21,1.08 -2.58,0 -1.59,-1.05 -2.06,-3.06 -3.68,-2.13 -1.3,-1.54 0.26,-4.43 -0.91,-3.89 0.31,-5.29 -0.97,-1.52 -3.65,-1.1 -0.67,-0.7 -0.18,-1.41 4.01,-4.1 7.73,-1.86 1.37,-3.56 2.69,-4.63 0.12,-2.35 -1.11,-4.55 0.7,-2.11 1.36,-1.42 2.26,-0.31 1.43,0.61 1.21,1.45 1.28,3.78 1.92,1.46 4.61,-1.77 4.17,0.2 5.41,-2.75 1.49,0.22 z"], ["SA-12", "m 13.437176,126.05041 0.66,-2.82 0.74,-0.76 -0.18,-0.82 1.04,-0.61 -0.48,-1.92 0.81,-0.46 -0.24,-0.86 0.61,-1.36 38.21,6.79 14.65,-12.07 8.85,-14.779995 25.760004,-5.16 5.78,-13.18 11.32,-6.78 -34.260004,-39.72 33.690004,-9.9 0,0 -1.27,6.06 -2.84,8.34 0.58,6.72 4.7,3.69 3.89,6.96 2.19,1.9 2.31,0.62 3.42,0.04 13.58,-1.49 7.25,-1.36 8.05,-0.14 19.01,3.45 4.38,0.08 1.78,0.77 3.98,3.44 3.7,1.12 17.95,0.62 7.01,-0.88 2.7,1.26 7.57,6.08 3.23,0.65 5.45,-0.04 3.6,1.59 2.09,2.5 3.13,6.39 7.78,6.26 0.1,1.57 -5.26,4.73 -27.27,16.849995 -6.16,4.72 -1.4,2.47 -0.39,9.36 -0.89,6.06 -5.62,5.69 0,0 -3.04,-0.66 -12.9,5.53 -13.07,7.6 -4.29,0.69 -9.93,4.38 -6.27,3.54 -3.69,4.2 0,0 -1.41,-1.21 -1.63,-0.49 -3.39,1 0,0 -3.56,1.88 -1.73,0.08 0,0 -1.3,-1.08 -0.78,-2.47 -0.75,-0.21 0,0 -1.64,0.32 0,0 -0.77,-0.47 0,0 -1.54,-1.26 0,0 -0.8,0.04 -2.4,1.75 0,0 -10.13,-1.18 0,0 -3.32,-1.1 0,0 -2.42,-1.21 -3.47,-3.55 0,0 -0.75,-1.63 0,0 -0.57,-2.65 0,0 -0.31,-4.39 0.45,-7.19 0,0 -0.46,-1.64 0,0 -1.57,-0.94 -0.77,0.41 0,0 -2.87,2.88 0,0 -1.58,0.72 0,0 -1.26,1.47 0,0 -2.58,6.06 0,0 -1.57,0.57 0,0 -8.550004,-0.71 -4.62,-1.8 -5.16,-0.72 0,0 -4.47,0.84 0,0 -4.39,1.03 -3.28,1.37 0,0 -1.81,0.33 -1.72,-0.64 0,0 -6.23,-8.13 0,0 -1.17,-1.64 0,0 -1.99,-2.37 -2.51,-1.93 0,0 -5.08,-1.54 0,0 -2.61,-0.51 0,0 -3.38,0.17 0,0 -3.31,0.69 0,0 -2.35,-0.22 0,0 -6.03,1.09 0,0 -3.27,0.83 0,0 -2.3,2.26 -1.93,0.12 0,0 -5.24,-0.69 0,0 -2.49,-0.78 -1.64,0.61 -3.23,-0.16 0,0 0.39,-2.96 0.64,-1.27 -0.41,-1.66 0.82,-1.35 z"], ["SA-14", "m 303.24718,558.19041 -1.98,-3.01 -2.95,-0.6 -0.68,-0.57 -2.65,-4.63 -3.6,-1.82 0.14,-4.42 -1,-1.12 -2.21,0.88 -2.87,2.16 -1.21,2.1 -1.66,6.75 -0.57,0.66 -1.4,0.14 -1.52,-0.63 -3.25,-3.16 -1.59,-3.73 -1.28,-1.24 -8.28,-0.4 -0.73,-0.64 -0.85,-2.89 -1.08,-1.35 -2.16,-0.23 -2.94,0.45 -0.74,-0.47 -0.28,-1.5 0.83,-7.27 -1.27,-1.03 -4.46,0.47 0,0 1.5,-6.41 -2.97,-9.14 -2.11,-1.2 -6.71,-0.21 -1.43,-0.49 -1.03,-1.47 -0.61,-2.97 0.49,-10 1.97,1.88 0.75,-0.06 3.87,-2.82 2.24,-0.38 4.74,0.44 1.52,-0.75 0.76,-1.42 1.27,-4.6 -2.19,-4.44 1.31,-6.92 -0.21,-1.51 -1.85,-1.89 -2.29,-0.13 -1.5,0.74 0,0 4.26,-8.69 -0.23,-3.55 0.84,-1.79 5.82,-3.97 1.04,-1.45 -0.11,-1.59 -2.05,-1.97 -0.23,-0.79 2.15,-6.42 0,0 4.67,9.08 1.4,1.02 2.28,0.24 2.31,-1.13 10.11,-9.25 6.41,-3.06 4.26,-3.8 4.55,-0.28 3.16,-1.52 2.26,-0.24 5.21,1.3 5.72,-3.77 4.02,-1.46 0,0 5.76,5.01 3.07,4.93 3.6,3.6 1.06,1.73 -0.08,2.96 -3.34,6.09 -1.23,6.11 0.22,1.6 2.75,2.96 3.91,6.36 13.54,12.09 0,0 -0.04,6.08 -1.12,1.39 -3.85,1.94 -0.69,1.59 1.76,8.57 -0.17,2.12 -0.97,2.22 -1.22,1.41 -2.38,1.42 -6.32,2.02 -0.95,1.05 -1.06,3.02 -1.08,1.48 -8.21,7.56 -3.08,3.43 -0.88,1.69 -0.08,1.66 1.38,6.12 -0.77,8.37 -0.67,1.47 1.3,5.93 -1.15,3.24 0,0 -0.11,1.8 -2.37,-2.3 -5.29,-3.37 -2.46,-0.34 z"]];
+const RNAME={'SA-01':'الرياض','SA-04':'الشرقية','SA-06':'حائل','SA-07':'تبوك','SA-09':'جازان'};
+const RLABEL={'SA-01':[374,350],'SA-04':[520,330],'SA-06':[250,202],'SA-07':[110,210],'SA-09':[262,560]};
+const CITYPOS={'الرياض':[420,283],'المجمعة':[374,238],'الخرج':[441,304],'الأفلاج':[427,374],'وادي الدواسر':[351,443],'الدمام':[530,214],'الخبر':[548,232],'حائل':[248,177],'تبوك':[78,150],'جازان':[277,566]};
+const OFFS=[[0,0],[-40,-4],[40,-6],[0,-40]];
+const LABS={
+ 'SA-01':{'الرياض':[['معمل الروضة','جمعية إنسان'],['معمل الشرق','جمعية إنسان'],['معمل المربع','جمعية إنسان'],['معمل الفيحاء · بنات','جمعية البر']],'المجمعة':[['معمل المجمعة','جمعية إنسان']],'الخرج':[['معمل الخرج','جمعية إنسان']],'الأفلاج':[['معمل الأفلاج','جمعية إنسان']],'وادي الدواسر':[['معمل وادي الدواسر','جمعية إنسان']]},
+ 'SA-04':{'الدمام':[['معمل الدمام · بنين','جمعية بناء']],'الخبر':[['معمل الخبر · بنات','جمعية بناء']]},
+ 'SA-06':{'حائل':[['معمل حائل · بنين','جمعية رفاق'],['معمل حائل · بنات','جمعية رفاق']]},
+ 'SA-07':{'تبوك':[['معمل تبوك','جمعية تمكين']]},
+ 'SA-09':{'جازان':[['معمل جازان · بنين','جمعية غراس']]}
+};
+const STATIONS=[
+ {n:'من يحتاجنا؟',d:'الثلاثاء 27 أكتوبر'},
+ {n:'اختيار المبادرة',d:'الأربعاء 28 أكتوبر'},
+ {n:'خطة التنفيذ وتوزيع الأدوار',d:'الثلاثاء 3 نوفمبر'},
+ {n:'توثيق الأثر وتجهيز التقرير',d:'الأربعاء 4 نوفمبر'},
+ {n:'يوم العمل التطوعي',d:'الأحد 22 نوفمبر',day:true}
+];
+const DEF_DATES=['2026-10-27','2026-10-28','2026-11-03','2026-11-04','2026-11-22'];
+const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'],MONTHS=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+function pd(iso){const p=iso.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]);}
+function fmtD(iso){if(!iso)return 'لم يُحدَّد موعدها';const t=pd(iso);return DAYS[t.getDay()]+' '+t.getDate()+' '+MONTHS[t.getMonth()];}
+function daysTo(iso){const t=new Date();return Math.round((pd(iso)-new Date(t.getFullYear(),t.getMonth(),t.getDate()))/864e5);}
+function inDays(n){return n===1?'غدًا':n===2?'بعد يومين':n<=10?'بعد '+n+' أيام':'بعد '+n+' يومًا';}
+const STAGES=['بذرة','نبتة صغيرة','أوراق أولى','ساق قوية','برعم','زهرة مبادرتكم'];
+const NEEDS=['كبار السن','الأطفال','البيئة والحدائق','ذوو الإعاقة','المرضى في المستشفيات','فئة أخرى'];
+const SUGG={'كبار السن':['أنس الجيران','جوالي سهل','زيارة الخميس'],'الأطفال':['ركن الحكايات','يوم ألعاب تعليمية','صديق الواجبات'],'البيئة والحدائق':['ساحتنا خضراء','حيّنا نظيف','فرز من أجل الأرض'],'ذوو الإعاقة':['كتاب بصوتي','طريق بلا عوائق','لعبة للجميع'],'المرضى في المستشفيات':['هدية الشفاء','ركن القراءة في الجناح','رسائل أمل'],'فئة أخرى':['مبادرة حيّنا','يد واحدة']};
+const ROLES=['قائد الفريق','منسّق المهام','موثّق بالصور','مسؤول التواصل','منفّذ'];
+const VERIFY=['سألنا المسؤول عنهم','قابلنا المستفيدين','لاحظنا بأنفسنا','استبيان قصير'];
+const MEASURES=['عدد المستفيدين','صور قبل وبعد','آراء المستفيدين','ساعات التطوع'];
+const DURS=['ساعتان','3 ساعات','4 ساعات'];
+const PROVIDERS=['الفريق','الجمعية','المعمل','جهة نتعاون معها'];
+const APPROVAL=['وافقوا','ننتظر الرد'];
+const CONT=['تستمر أسبوعيًا','تستمر شهريًا','تُنفَّذ مرة واحدة'];
+
+const LOGO='<svg class="logo" viewBox="20 20 100 23" role="img" aria-label="نون"><path d="M57.274 21.334c-5.859 0-10.606 4.7-10.606 10.5s4.747 10.5 10.606 10.5c5.858 0 10.605-4.7 10.605-10.5s-4.751-10.5-10.605-10.5z" fill="#64D8AE"/><path d="M57.112 36.865c3.241 3.091 8.535 3.108 11.755 0 .5-.483-.318-1.134-.776-.693-2.821 2.726-7.356 2.71-10.203 0-.462-.44-1.28.21-.776.693z" fill="currentColor"/><path d="M82.73 21.334c-5.858 0-10.605 4.7-10.605 10.5s4.747 10.5 10.606 10.5c5.858 0 10.605-4.7 10.605-10.5s-4.751-10.5-10.605-10.5zm0 17.5c-3.902 0-7.071-3.132-7.071-7 0-3.869 3.165-7.002 7.072-7.002 3.903 0 7.071 3.133 7.071 7.002 0 3.868-3.169 7-7.071 7zM31.816 21.334c-5.858 0-10.605 4.7-10.605 10.5v9.24c0 .462.382.84.848.84h1.837a.847.847 0 00.848-.84v-9.24c0-3.864 3.165-7.002 7.072-7.002 3.903 0 7.072 3.133 7.072 7.002v9.24c0 .462.382.84.848.84h1.837a.847.847 0 00.849-.84v-9.24c0-5.8-4.747-10.5-10.606-10.5zM108.184 21.334c-5.859 0-10.606 4.7-10.606 10.5v9.24c0 .462.382.84.849.84h1.837a.847.847 0 00.848-.84v-9.24c0-3.864 3.165-7.002 7.072-7.002 3.902 0 7.071 3.133 7.071 7.002v9.24c0 .462.382.84.849.84h1.837a.847.847 0 00.848-.84v-9.24c0-5.8-4.747-10.5-10.605-10.5z" fill="currentColor"/></svg>';
+const IC_PIN='<svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+const IC_LAB='<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>';
+const IC_TEAM='<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.5a5 5 0 0 1 5 5"/></svg>';
+
+function plant(stage,cls){
+  const g=(min,max,body,tr)=>'<g transform="'+tr+'"><g class="grow'+(stage>=min&&stage<=(max||99)?' on':'')+'" data-min="'+min+'" data-max="'+(max||99)+'">'+body+'</g></g>';
+  const leaf=(w,c)=>'<path d="M0 0 C'+(w*.23)+' -'+(w*.32)+' '+(w*.77)+' -'+(w*.32)+' '+w+' 0 C'+(w*.77)+' '+(w*.23)+' '+(w*.23)+' '+(w*.23)+' 0 0Z" fill="'+c+'"/>';
+  return '<svg class="'+(cls||'plant')+'" viewBox="0 0 200 240" aria-hidden="true"><circle cx="152" cy="46" r="20" fill="#f6d27a" opacity=".8"/><g class="sway">'+
+   '<path class="stem" pathLength="100" style="stroke-dashoffset:'+(100-stage*20)+'" d="M100 196 C 96 160, 106 130, 98 100 S 102 70, 100 62"/>'+
+   g(1,0,leaf(44,'var(--leaf)'),'translate(99 172) rotate(-160)')+g(1,0,leaf(35,'#64D8AE'),'translate(101 160) rotate(-20)')+
+   g(2,0,leaf(46,'var(--leaf)'),'translate(101 132) rotate(-25)')+g(2,0,leaf(39,'#64D8AE'),'translate(99 118) rotate(-155)')+
+   g(3,0,leaf(31,'var(--leaf)'),'translate(99 92) rotate(-150)')+g(3,0,leaf(28,'#64D8AE'),'translate(101 84) rotate(-30)')+
+   g(4,4,'<ellipse cx="0" cy="-8" rx="9" ry="13" fill="#d9558f"/><path d="M-9 -2 Q0 6 9 -2 L6 4 Q0 8 -6 4Z" fill="var(--leaf)"/>','translate(100 62)')+
+   g(5,0,'<g fill="#d9558f"><ellipse cx="0" cy="-17" rx="10" ry="15"/><ellipse cx="0" cy="17" rx="10" ry="15"/><ellipse cx="-17" cy="0" rx="15" ry="10"/><ellipse cx="17" cy="0" rx="15" ry="10"/></g><g fill="#ee8fb7"><ellipse cx="-12" cy="-12" rx="9" ry="13" transform="rotate(-45 -12 -12)"/><ellipse cx="12" cy="-12" rx="9" ry="13" transform="rotate(45 12 -12)"/><ellipse cx="-12" cy="12" rx="9" ry="13" transform="rotate(45 -12 12)"/><ellipse cx="12" cy="12" rx="9" ry="13" transform="rotate(-45 12 12)"/></g><circle r="10" fill="#d99b2b"/><circle r="4" fill="#f6d27a"/>','translate(100 58)')+
+   '</g>'+(stage===0?'<ellipse cx="100" cy="190" rx="7" ry="5" fill="#a8701a"/>':'')+
+   '<path d="M58 196 H142 L134 236 H66Z" fill="var(--pot)"/><rect x="52" y="188" width="96" height="14" rx="5" fill="var(--potrim)"/><ellipse cx="100" cy="190" rx="44" ry="4" fill="var(--soil)"/></svg>';
+}
+const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function confetti(){
+  if(reduce)return;const c=document.getElementById('confetti'),dpr=devicePixelRatio||1,W=innerWidth,H=innerHeight;
+  c.width=W*dpr;c.height=H*dpr;const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+  const cols=['#d9558f','#64D8AE','#d99b2b','#0C8075','#ee8fb7'];
+  const ps=Array.from({length:90},()=>({x:W/2,y:H*.3,vx:(Math.random()-.5)*9,vy:-Math.random()*8-3,s:Math.random()*6+4,c:cols[Math.random()*5|0],a:Math.random()*6}));
+  let t=0;(function f(){x.clearRect(0,0,W,H);ps.forEach(p=>{p.vy+=.22;p.x+=p.vx;p.y+=p.vy;p.a+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore();});if(++t<120)requestAnimationFrame(f);else x.clearRect(0,0,W,H);})();
+}
+
+/* ---------- الربط بالشيت (Google Apps Script) ---------- */
+const API='https://script.google.com/macros/s/AKfycbwICdJtt6KJPMYhLup_tEhHZjyIrC3Lt8hYVel2Ex_KHmd9AVNujqjvlux4xEWgDulh/exec';
+let GARDEN=[];
+async function apiGet(params){const u=API+'?'+new URLSearchParams(params).toString();const r=await fetch(u);return r.json();}
+async function apiPost(body){const r=await fetch(API,{method:'POST',body:JSON.stringify(body)});return r.json();}
+/* ---------- state: يُحفظ في الشيت، ونسخة على الجهاز للسرعة ---------- */
+const fresh=()=>({screen:'welcome',region:null,city:null,lab:null,team:null,dates:DEF_DATES.slice(),mode:['auto','auto','auto','auto','auto'],edit:null});
+let S=fresh();
+try{const v=JSON.parse(localStorage.getItem('athr-v1')||'null');if(v&&v.dates)S=Object.assign(fresh(),v);}catch(e){}
+function save(){try{localStorage.setItem('athr-v1',JSON.stringify(S));}catch(e){}}
+async function loadConfig(){try{const c=await apiGet({action:'config'});if(c&&c.ok){
+  c.stations.forEach((x,i)=>{if(i<5){S.dates[i]=x.date||'';S.mode[i]=x.mode||'auto';}});GARDEN=c.teams||[];
+  if(S.team&&S.team.code){const t=await apiGet({action:'team',code:S.team.code});if(t&&t.ok){S.team=t.team;}}
+  save();render();}}catch(e){}}
+function toast(msg,bad){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t);}
+  t.textContent=msg;t.className=bad?'bad':'';t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,3200);}
+function shrink(file){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>{const m=1600,k=Math.min(1,m/Math.max(img.width,img.height));
+  const c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+  URL.revokeObjectURL(img.src);res(c.toDataURL('image/jpeg',0.82).split(',')[1]);};img.onerror=rej;img.src=URL.createObjectURL(file);});}
+function isOpen(i){const m=S.mode[i];if(m==='open')return true;if(m==='closed')return false;return !!S.dates[i]&&daysTo(S.dates[i])<=0;}
+const dl=i=>fmtD(S.dates[i]);
+function lockNote(i){if(S.mode[i]==='closed')return 'مقفلة حاليًا';if(!S.dates[i])return 'لم يُحدَّد موعدها بعد';return 'تُفتح '+dl(i)+' · '+inDays(daysTo(S.dates[i]));}
+const done=i=>!!(S.team&&S.team.a&&S.team.a[i]);
+const stage=()=>S.team?[0,1,2,3,4].filter(done).length:0;
+function go(scr,extra){Object.assign(S,extra||{});S.screen=scr;save();render();scrollTo({top:0,behavior:reduce?'auto':'smooth'});}
+
+const app=document.getElementById('app');
+function bar(back){return '<div class="bar">'+(back?'<button class="back" data-back="'+back+'">رجوع</button>':LOGO)+'</div>';}
+function stepsBar(n){return '<div class="steps">'+[1,2,3,4].map(i=>'<i class="'+(i<=n?'on':'')+'"></i>').join('')+'</div>';}
+
+const V={};
+V.welcome=()=>bar()+
+ '<div class="hero"><span class="pill">برنامج أثر</span>'+plant(5)+'<h1>رحلة أثر</h1><p class="sub">من الاحتياج إلى مبادرة يصنعها فريقك.</p></div>'+
+ '<button class="btn" data-go="map">ابدأ مع فريقك</button><button class="btn ghost" data-go="join">عندي رمز فريق</button>';
+
+V.map=()=>bar('welcome')+stepsBar(1)+
+ '<div><div class="eyebrow">الخطوة 1 من 4</div><h2 class="title">أين معملك؟</h2><p class="sub">اضغط على زرعة معملك، أو على منطقتك.</p></div>'+
+ '<div class="mapbox"><svg class="map" viewBox="0 0 730 600" role="img" aria-label="خريطة المملكة">'+
+ REGIONS.map(r=>'<path d="'+r[1]+'"'+(LABS[r[0]]?' class="lab" data-region="'+r[0]+'" tabindex="0" role="button" aria-label="'+RNAME[r[0]]+'"':'')+'/>').join('')+
+ '<defs><symbol id="mp" viewBox="0 0 40 50"><ellipse cx="20" cy="47" rx="13" ry="3" fill="rgba(0,0,0,.18)"/><path d="M20 34 C18 26 22 20 20 12" stroke="#3fa27c" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M20 24 C14 16 6 18 4 21 C8 26 15 27 20 24Z" fill="#3fa27c"/><path d="M20 18 C25 10 33 11 36 14 C32 20 25 21 20 18Z" fill="#64D8AE"/><circle cx="20" cy="10" r="4.5" fill="#f8c86a"/><path d="M9 33 H31 L28 46 H12Z" fill="#0C8075"/><rect x="7" y="31" width="26" height="5" rx="2" fill="#0a6b62"/></symbol></defs>'+
+ Object.keys(RLABEL).map(k=>'<text x="'+RLABEL[k][0]+'" y="'+(RLABEL[k][1]+30)+'" text-anchor="middle">'+RNAME[k]+'</text>').join('')+
+ Object.keys(LABS).map(r=>Object.keys(LABS[r]).map(c=>LABS[r][c].map((l,i)=>{const p=CITYPOS[c],o=OFFS[i]||[0,0];
+   return '<g class="mpl" data-pick="'+r+'|'+c+'|'+i+'" tabindex="0" role="button" aria-label="'+l[0]+' · '+c+'" style="animation-delay:'+((i*.4+p[0]%7*.2).toFixed(1))+'s"><use href="#mp" x="'+(p[0]+o[0]-24)+'" y="'+(p[1]+o[1]-58)+'" width="48" height="60"/></g>';}).join('')).join('')).join('')+
+ '</svg><div class="legend"><span>كل زرعة معمل من معامل نون · اضغط على زرعة معملك</span></div></div>'+
+ '<div class="sect">المعامل حسب المنطقة</div><div class="rcount">'+Object.keys(LABS).map(r=>{const n=Object.values(LABS[r]).reduce((a,b)=>a+b.length,0);
+   return '<button data-region="'+r+'"><b>'+RNAME[r]+'</b><span>'+'<i></i>'.repeat(n)+'</span><small>'+(n===1?'معمل واحد':n===2?'معملان':n+(n<11?' معامل':' معملًا'))+'</small></button>';}).join('')+'</div>';
+
+V.city=()=>{const cs=Object.keys(LABS[S.region]);return bar('map')+stepsBar(2)+
+ '<div><div class="eyebrow">الخطوة 2 من 4 · منطقة '+RNAME[S.region]+'</div><h2 class="title">اختر مدينتك</h2></div><div class="list">'+
+ cs.map(c=>'<button class="row" data-city="'+c+'"><span class="ic">'+IC_PIN+'</span><span>'+c+'<small>'+LABS[S.region][c].length+(LABS[S.region][c].length>1?' معامل':' معمل')+'</small></span><span class="go">‹</span></button>').join('')+'</div>';};
+
+V.lab=()=>{const ls=LABS[S.region][S.city];return bar('city')+stepsBar(3)+
+ '<div><div class="eyebrow">الخطوة 3 من 4 · '+S.city+'</div><h2 class="title">اختر فرع معملك</h2></div><div class="list">'+
+ ls.map((l,i)=>'<button class="row" data-lab="'+i+'"><span class="ic">'+IC_LAB+'</span><span>'+l[0]+'<small>'+l[1]+'</small></span><span class="go">‹</span></button>').join('')+'</div>';};
+
+V.team=()=>bar('lab')+stepsBar(4)+
+ '<div><div class="eyebrow">الخطوة 4 من 4 · '+esc(S.lab[0])+'</div><h2 class="title">كوّن فريقك</h2><p class="sub">اسم واحد للفريق، وأسماء أعضائه.</p></div>'+
+ '<div class="card" style="display:flex;flex-direction:column;gap:14px"><label class="f">اسم الفريق<input class="in" id="tname" maxlength="30" placeholder="مثال: فريق غيث"></label>'+
+ '<div class="f" style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:15px">أعضاء الفريق <small style="font-weight:400;color:var(--mut);font-size:13px">من 3 إلى 6 أعضاء</small><div class="members">'+
+ [0,1,2,3,4,5].map(i=>'<input class="in" id="m'+i+'" maxlength="24" placeholder="العضو '+(i+1)+'">').join('')+'</div></div></div>'+
+ '<button class="btn" id="mk">أنشئ الفريق</button>';
+
+V.join=()=>bar('welcome')+
+ '<div><h2 class="title">ادخل رمز فريقك</h2><p class="sub">الرمز من 4 أرقام، ظهر لفريقك عند إنشائه.</p></div>'+
+ '<div class="card" style="display:flex;flex-direction:column;gap:12px"><input class="in" id="jcode" inputmode="numeric" maxlength="4" placeholder="مثال: 4821" style="font-size:24px;text-align:center;letter-spacing:6px;direction:ltr">'+
+ '<button class="btn" id="jgo">ادخل</button><p class="note" id="jmsg">اطلب الرمز من قائد فريقك.</p></div>';
+
+V.code=()=>bar()+
+ '<div class="hero"><span class="pill">'+esc(S.team.name)+'</span>'+plant(0)+'<h2 class="title">فريقكم جاهز</h2><p class="sub">هذا رمز فريقكم. به يدخل أي عضو ويعدّل من جواله.</p><div class="code">'+S.team.code+'</div></div>'+
+ '<button class="btn" data-go="home">ابدأ الرحلة</button>';
+
+V.home=()=>{const st=stage(),nx=STATIONS.findIndex((_,i)=>!done(i));
+ const ini=S.team.members.map(m=>'<i title="'+esc(m)+'">'+esc(m.trim().charAt(0))+'</i>').join('');
+ const head='<div class="hhead"><div class="ring"></div><div class="ht">'+LOGO+'<span>برنامج أثر · رمز '+S.team.code+'</span></div>'+
+  '<div class="hero2"><div class="txt"><small>'+esc(S.lab[0])+' · '+esc(S.city)+'</small><h2>'+esc(S.team.name)+'</h2>'+
+  '<div class="pct"><b class="num">'+(st*20)+'%</b><span>من الرحلة</span></div><div class="avs">'+ini+'</div><span class="stg2">'+STAGES[st]+'</span></div>'+plant(st)+'</div></div>';
+ const X=[72,30,68,32,64],GAP=150,TOP=70,H=TOP+GAP*5+40;
+ let d='M'+X[0]+' '+TOP;for(let i=1;i<=5;i++){const x0=X[i-1],y0=TOP+GAP*(i-1),x1=i<5?X[i]:50,y1=TOP+GAP*i;d+=' C'+x0+' '+(y0+GAP*.55)+' '+x1+' '+(y1-GAP*.55)+' '+x1+' '+y1;}
+ const road='<div class="sect">طريق الرحلة</div><div class="road" style="height:'+H+'px"><svg viewBox="0 0 100 '+H+'" preserveAspectRatio="none" aria-hidden="true">'+
+  '<path d="'+d+'" fill="none" stroke="var(--roadbg)" stroke-width="26" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'+
+  '<path d="'+d+'" fill="none" stroke="var(--roaddot)" stroke-width="3" stroke-dasharray="2 12" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>'+
+  STATIONS.map((s,i)=>{const dn=done(i),o=isOpen(i),now=i===nx&&o;const cls=dn?'done':now?'now':o?'open':'lock';
+   return '<button class="rn '+cls+(s.day?' day':'')+'" data-st="'+i+'" style="left:'+X[i]+'%;top:'+(TOP+GAP*i)+'px"'+(!o&&!dn?' aria-disabled="true"':'')+'>'+
+    '<span class="c">'+(dn?'✓':s.day?'★':i+1)+'</span><b>'+s.n+'</b>'+(now?'<span class="go">ابدؤوا الآن</span>':'<small>'+(dn?'تمّت · تعديل':o?dl(i):lockNote(i))+'</small>')+'</button>';}).join('')+
+  '<div class="rgoal" style="top:'+(TOP+GAP*5)+'px">'+plant(5,'')+'<small>'+(st===5?'تفتّحت زهرة مبادرتكم':'تتفتّح يوم العمل التطوعي')+'</small></div></div>';
+ const outs=[[1,'بطاقة مبادرتنا','✎'],[2,'خطة التنفيذ','☷'],[3,'خطة قياس الأثر','◎'],[4,'تقرير الأثر','★']];
+ const outsH='<div class="sect">مخرجات الفريق</div><div class="outs2">'+outs.map(o=>{const ok=done(o[0]);
+   return '<button class="o2'+(ok?'':' off')+'" '+(ok?(o[0]===4?'data-go="report"':'data-card="'+o[0]+'"'):'disabled')+'><span class="ico">'+o[2]+'</span><b>'+o[1]+'</b><small>'+(ok?'جاهزة · افتحوها':'بعد '+(o[0]===4?'يوم التطبيق':'المحطة '+(o[0]+1)))+'</small></button>';}).join('')+
+   '</div><button class="btn ghost" data-go="report" style="font-size:15px">تقرير الأثر كما وصل الآن · '+st+' من 5</button>';
+ const garden='<div class="sect">حديقة '+esc(S.lab[0])+'</div><div class="mini">'+
+ [[esc(S.team.name),st,1]].concat(GARDEN.filter(t=>t.lab===S.lab[0]&&t.name!==S.team.name).map(t=>[esc(t.name),Math.min(5,+t.stage||0)])).map(t=>'<div class="'+(t[2]?'me':'')+'">'+plant(t[1],'')+t[0]+'<small>'+STAGES[t[1]]+'</small></div>').join('')+'</div>';
+ const admin='';
+ let cta;
+ if(nx<0) cta='<div class="ctabar"><button class="btn mint" data-go="report">اكتملت الرحلة · افتحوا تقرير الأثر</button></div>';
+ else if(isOpen(nx)) cta='<div class="ctabar"><button class="btn cta" data-st="'+nx+'">ابدؤوا محطة «'+STATIONS[nx].n+'»</button></div>';
+ else cta='<div class="ctabar"><div class="waitbar"><b>المحطة القادمة: '+STATIONS[nx].n+'</b><span>'+lockNote(nx)+'</span></div></div>';
+ return '<div class="home2">'+head+'<div class="hgrid"><div class="colA">'+road+'</div><div class="colB">'+outsH+garden+admin+'</div></div>'+cta+'</div>';};
+
+/* station forms */
+function field(id,label,ph,val,hint,type){return '<label class="f">'+label+(hint?'<small>'+hint+'</small>':'')+'<input class="in" id="'+id+'" '+(type?'type="'+type+'" inputmode="numeric" ':'')+'maxlength="80" placeholder="'+ph+'" value="'+esc(val)+'"></label>';}
+function chips(id,opts,val,multi){val=multi?(val||[]):val;return '<div class="choices" data-chips="'+id+'"'+(multi?' data-multi="1"':'')+'>'+opts.map(o=>'<button type="button" class="ch" aria-pressed="'+(multi?val.includes(o):val===o)+'">'+o+'</button>').join('')+'</div>';}
+function cmtRow(c){return '<div class="cm"><span class="cn"></span><textarea class="in" rows="2" maxlength="200" placeholder="اكتبوا التعليق كما قاله المستفيد">'+esc(c.t)+'</textarea><input class="in" maxlength="40" placeholder="من قاله؟ مثال: مسنّة في الدار" value="'+esc(c.w)+'"><button type="button" class="rm" aria-label="احذفوا هذا التعليق">احذف</button></div>';}
+V.station=()=>{const i=S.edit,s=STATIONS[i],a=(S.team.a&&S.team.a[i])||{},A=S.team.a||{};let body='';
+ if(i===0) body='<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">المستفيدون'+chips('need',NEEDS,a.need)+'</div>'+
+   field('where','من هم بالتحديد؟','مثال: كبار السن في دار رعاية حي الروضة',a.where)+
+   field('problem','المشكلة','مثال: يقضون ساعات طويلة بلا نشاط',a.problem,'ما الذي لاحظتموه؟')+
+   field('real','الاحتياج الحقيقي','مثال: من يشاركهم نشاطًا أسبوعيًا',a.real,'ما الذي ينقصهم فعلًا؟')+
+   '<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">كيف تأكدنا منه؟<small style="font-weight:400;color:var(--mut);font-size:13px">اختاروا كل ما فعلتموه</small>'+chips('verify',VERIFY,a.verify,true)+'</div>';
+ if(i===1) body='<div class="carry">من المحطة 1 · المستفيدون: <b>'+esc(A[0].where)+'</b>، والاحتياج الحقيقي: <b>'+esc(A[0].real)+'</b></div>'+
+   field('name','اسم المبادرة','اكتبوا اسمًا قصيرًا',a.name)+'<div class="sugg" id="sugg">'+(SUGG[A[0].need]||[]).map(x=>'<button type="button">'+x+'</button>').join('')+'</div>'+
+   field('goal','هدف المبادرة','مثال: كسر عزلة كبار السن في الدار',a.goal)+
+   field('activity','النشاط المقترح','مثال: زيارة أسبوعية فيها قراءة وألعاب',a.activity)+
+   field('impact','الأثر المتوقع','مثال: 20 مسنًّا يشاركون في نشاط أسبوعي',a.impact,'ما الذي سيتغيّر بعد المبادرة؟');
+ if(i===2) body='<div class="carry">مبادرتكم · <b>'+esc(A[1].name)+'</b>، والنشاط: <b>'+esc(A[1].activity)+'</b></div>'+
+   field('place','مكان التنفيذ','مثال: دار رعاية حي الروضة',a.place,'يوم التنفيذ: '+dl(4))+
+   '<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">مدة التنفيذ'+chips('dur',DURS,a.dur)+'</div>'+
+   '<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">خطوات التنفيذ<small style="font-weight:400;color:var(--mut);font-size:13px">ثلاث خطوات بالترتيب</small>'+[0,1,2].map(k=>'<input class="in" id="step'+k+'" maxlength="80" placeholder="'+['مثال: نستقبل المستفيدين ونعرّفهم بالفريق','مثال: نبدأ النشاط في مجموعات صغيرة','مثال: نختم بصورة جماعية وسؤال الأثر'][k]+'" value="'+esc((a.steps||[])[k])+'">').join('')+'</div>'+
+   '<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">دور كل عضو'+S.team.members.map((m,k)=>'<div class="role"><span>'+esc(m)+'</span><select class="in" id="r'+k+'">'+ROLES.map(r=>'<option'+((a.roles||[])[k]===r?' selected':'')+'>'+r+'</option>').join('')+'</select></div>').join('')+'</div>'+
+   field('tools','ما الذي تحتاجونه؟','مثال: 10 كتب، ألعاب لوحية، ضيافة',a.tools)+
+   '<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">من يوفّره؟<small style="font-weight:400;color:var(--mut);font-size:13px">اختاروا كل ما ينطبق</small>'+chips('prov',PROVIDERS,a.prov,true)+'</div>'+
+   field('approver','من نحتاج موافقته؟','مثال: إدارة دار الرعاية',a.approver)+
+   '<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">هل وافق؟'+chips('appr',APPROVAL,a.appr)+'</div>';
+ if(i===3){const docs=S.team.members.filter((m,k)=>A[2].roles[k]==='موثّق بالصور');
+   body='<div class="carry">الأثر المتوقع · <b>'+esc(A[1].impact)+'</b>'+(docs.length?'<br>يوثّق بالصور: <b>'+esc(docs.join('، '))+'</b>':'')+'</div>'+
+   field('before','الوضع قبل المبادرة','مثال: لا يوجد نشاط أسبوعي في الدار',a.before,'نقارن به بعد التنفيذ')+
+   '<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">كيف ستثبتون الأثر؟<small style="font-weight:400;color:var(--mut);font-size:13px">اختاروا كل ما ينطبق</small>'+chips('measures',MEASURES,a.measures,true)+'</div>'+
+   field('target','كم مستفيدًا تستهدفون؟','مثال: 20',a.target,'',"number")+
+   field('thours','كم ساعة تطوع تستهدفون لكل عضو؟','مثال: 3',a.thours,'',"number")+
+   field('askq','سؤال تطرحونه على المستفيدين بعد المبادرة','مثال: ما الذي أعجبك اليوم؟ وهل تريد أن نعود؟',a.askq,'إجاباتهم تدخل في تقرير الأثر');}
+ if(i===4) body='<div class="carry">المستهدف: <b>'+esc(A[3].target)+'</b> مستفيدًا، و<b>'+esc(A[3].thours)+'</b> ساعات لكل عضو<br>سؤالكم: <b>'+esc(A[3].askq)+'</b></div>'+
+   field('actual','كم مستفيدًا خدمتم فعلًا؟','مثال: 22',a.actual,'',"number")+field('hours','كم ساعة تطوّع كل عضو؟','مثال: 3',a.hours,'',"number")+
+   '<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">تعليقات المستفيدين<small style="font-weight:400;color:var(--mut);font-size:13px">إجاباتهم على سؤالكم أو أي تعليق قالوه. أضيفوا كل التعليقات التي جمعتموها.</small><div id="cmts" style="display:flex;flex-direction:column;gap:10px">'+
+   (a.comments&&a.comments.length?a.comments:[{t:'',w:''}]).map(cmtRow).join('')+'</div><button type="button" class="addc" id="addc">+ أضيفوا تعليقًا آخر</button></div>'+
+   field('changed','ما الذي اختلف عن الخطة؟','مثال: حضر عدد أكبر فقسّمنا النشاط لمجموعتين',a.changed)+
+   '<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">هل تستمر المبادرة؟'+chips('cont',CONT,a.cont)+'</div>'+'<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">صور يوم التطبيق<small style="font-weight:400;color:var(--mut);font-size:13px">ارفعوا صورتين على الأقل من التنفيذ. تُحفظ في مجلد فريقكم.</small>'+
+   '<div class="thumbs" id="thumbs">'+((a.photos||[]).map(u=>'<a href="'+esc(u)+'" target="_blank" rel="noopener">صورة ✓</a>').join(''))+'</div>'+
+   '<label class="btn ghost" style="font-size:15px;text-align:center;cursor:pointer">+ أضيفوا صورًا<input type="file" id="phf" accept="image/*" multiple hidden></label><p class="note" id="phm"></p></div>';
+ return bar('home')+'<div><div class="eyebrow">'+(s.day?'يوم التطبيق':'المحطة '+(i+1)+' من 4')+' · '+dl(i)+'</div><h2 class="title">'+s.n+'</h2></div>'+
+  '<div class="card" style="display:flex;flex-direction:column;gap:14px">'+body+'</div><button class="btn" id="sv">'+(done(i)?'احفظ التعديل':'أكمل المحطة')+'</button><p class="note" id="msg" hidden>أكملوا كل الحقول أولًا.</p>';};
+
+const CARDS={
+ 1:{t:'بطاقة مبادرتنا',ses:'الحصة الثانية',cols:A=>[[['اسم الفريق',S.team.name],['اسم المبادرة',A[1].name],['المشكلة',A[0].problem],['الاحتياج الحقيقي',A[0].real],['كيف تأكدنا منه؟',A[0].verify.join('، ')]],[['المستفيدون',A[0].where],['هدف المبادرة',A[1].goal],['النشاط المقترح',A[1].activity],['الأثر المتوقع',A[1].impact]]]},
+ 2:{t:'خطة التنفيذ',ses:'الحصة الثالثة',cols:A=>[[['المكان',A[2].place],['اليوم والمدة',dl(4)+' · '+A[2].dur],['الخطوة 1',A[2].steps[0]],['الخطوة 2',A[2].steps[1]],['الخطوة 3',A[2].steps[2]]],[['الأدوار',S.team.members.map((m,k)=>m+': '+A[2].roles[k]).join(' · ')],['ما نحتاجه',A[2].tools],['يوفّره',A[2].prov.join('، ')],['الموافقة',A[2].approver+' · '+A[2].appr]]]},
+ 3:{t:'خطة قياس الأثر',ses:'الحصة الرابعة',cols:A=>[[['الوضع قبل المبادرة',A[3].before],['الأثر المتوقع',A[1].impact],['أدوات القياس',A[3].measures.join('، ')]],[['المستفيدون المستهدفون',A[3].target],['ساعات التطوع لكل عضو',A[3].thours],['سؤال الأثر',A[3].askq]]]}
+};
+V.card=()=>{const id=S.cardId||1,c=CARDS[id],A=S.team.a,f=x=>'<div class="bf"><span>'+x[0]+'</span><b>'+esc(x[1])+'</b></div>';
+ return bar('home')+'<div class="bcard"><div class="bhead"><span>'+c.ses+' · '+STATIONS[id].n+'</span>'+LOGO+'</div><h2>'+c.t+'</h2><div class="bbody"><div class="bstrip">'+esc(S.team.name)+' · '+esc((A[1]||{}).name||'')+'</div><div class="bgrid">'+
+ c.cols(A).map(col=>'<div>'+col.map(f).join('')+'</div>').join('')+'</div></div><div class="bfoot">'+esc(S.team.members.join(' · '))+' · '+esc(S.lab[0])+'</div></div>'+
+ '<button class="btn" data-go="home">تابعوا الرحلة</button><button class="btn ghost" data-edit="'+id+'">عدّلوا</button>';};
+V.report=()=>{const A=S.team.a||{},w=t=>'<span>يكتمل بعد محطة «'+t+'»</span>';
+ const row=(k,v,ok,t)=>'<div class="'+(ok?'':'wait')+'"><span>'+k+'</span>'+(ok?'<span>'+esc(v)+'</span>':w(t))+'</div>';
+ return bar('home')+'<div class="card report"><div class="eyebrow">تقرير الأثر · '+esc(S.team.name)+'</div><h2>'+(A[1]?esc(A[1].name):'مبادرة الفريق')+'</h2>'+
+ (A[4]?'<div class="big"><div><b>'+esc(A[4].actual)+'</b><span>مستفيدًا من '+esc(A[3].target)+' مستهدفًا</span></div><div><b>'+esc(A[4].hours)+'</b><span>ساعات تطوع موثّقة لكل عضو</span></div><div><b>'+A[4].comments.length+'</b><span>تعليقًا من المستفيدين</span></div></div>':'')+
+ '<div class="rows">'+row('المعمل',S.lab[0]+' · '+S.lab[1],1)+row('المستفيدون',A[0]&&A[0].where,A[0],STATIONS[0].n)+row('المشكلة',A[0]&&A[0].problem,A[0],STATIONS[0].n)+row('الاحتياج الحقيقي',A[0]&&A[0].real,A[0],STATIONS[0].n)+row('كيف تأكدنا منه',A[0]&&A[0].verify.join('، '),A[0],STATIONS[0].n)+
+ row('هدف المبادرة',A[1]&&A[1].goal,A[1],STATIONS[1].n)+row('النشاط',A[1]&&A[1].activity,A[1],STATIONS[1].n)+row('الأثر المتوقع',A[1]&&A[1].impact,A[1],STATIONS[1].n)+row('المكان',A[2]&&A[2].place+' · '+A[2].dur,A[2],STATIONS[2].n)+
+ row('الفريق والأدوار',A[2]&&S.team.members.map((m,k)=>m+' ('+A[2].roles[k]+')').join('، '),A[2],STATIONS[2].n)+
+ row('الوضع قبل المبادرة',A[3]&&A[3].before,A[3],STATIONS[3].n)+row('أدوات القياس',A[3]&&A[3].measures.join('، '),A[3],STATIONS[3].n)+
+ row('تعليقات المستفيدين',A[4]&&A[4].comments.map(c=>'«'+c.t+'»'+(c.w?' — '+c.w:'')).join('\n'),A[4],STATIONS[4].n)+row('ما اختلف عن الخطة',A[4]&&A[4].changed,A[4],STATIONS[4].n)+row('استمرار المبادرة',A[4]&&A[4].cont,A[4],STATIONS[4].n)+'</div></div>'+
+ '<p class="note">التقرير محفوظ في شيت البرنامج، ويصل للمشرفة أولًا بأول.</p>';};
+
+function render(){
+  if(['home','station','report','code','card'].includes(S.screen)&&!S.team)S.screen='welcome';
+  app.innerHTML='<div class="screen'+(S.screen==='home'?' wide':'')+'">'+V[S.screen]()+'</div>';
+  bind();
+}
+function bind(){
+  app.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+  app.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>go(b.dataset.back));
+  app.querySelectorAll('[data-region]').forEach(p=>{const f=()=>go('city',{region:p.dataset.region});p.onclick=f;p.onkeydown=e=>{if(e.key==='Enter')f();};});
+  app.querySelectorAll('[data-pick]').forEach(g=>{const f=e=>{e.stopPropagation();const p=g.dataset.pick.split('|');go('team',{region:p[0],city:p[1],lab:LABS[p[0]][p[1]][+p[2]]});};g.onclick=f;g.onkeydown=e=>{if(e.key==='Enter')f(e);};});
+  app.querySelectorAll('[data-city]').forEach(b=>b.onclick=()=>go('lab',{city:b.dataset.city}));
+  app.querySelectorAll('[data-lab]').forEach(b=>b.onclick=()=>go('team',{lab:LABS[S.region][S.city][+b.dataset.lab]}));
+  const mk=document.getElementById('mk');
+  if(mk)mk.onclick=()=>{const n=document.getElementById('tname').value.trim();const ms=[0,1,2,3,4,5].map(i=>document.getElementById('m'+i).value.trim()).filter(Boolean);
+    if(!n||ms.length<3){mk.textContent=!n?'اكتبوا اسم الفريق':'أضيفوا 3 أعضاء على الأقل';setTimeout(()=>mk.textContent='أنشئ الفريق',1600);return;}
+    mk.disabled=true;mk.textContent='جارٍ إنشاء الفريق…';
+    apiPost({action:'create',team:{name:n,members:ms,region:S.region,city:S.city,lab:S.lab}}).then(r=>{
+      if(!r.ok)throw 0;go('code',{team:r.team});}).catch(()=>{mk.disabled=false;mk.textContent='أنشئ الفريق';toast('تعذّر الاتصال. تأكدوا من الإنترنت وحاولوا مرة ثانية.',1);});};
+  const jg=document.getElementById('jgo');
+  if(jg)jg.onclick=()=>{const c=document.getElementById('jcode').value.trim();
+    const m=document.getElementById('jmsg');if(!/^\d{4}$/.test(c)){m.textContent='الرمز 4 أرقام.';return;}
+    jg.disabled=true;jg.textContent='جارٍ البحث…';
+    apiGet({action:'team',code:c}).then(r=>{if(r.ok){const t=r.team;go('home',{team:t,region:t.region,city:t.city,lab:t.lab});}
+      else{jg.disabled=false;jg.textContent='ادخل';m.textContent='الرمز غير صحيح. تأكدوا منه مع قائد الفريق.';}})
+    .catch(()=>{jg.disabled=false;jg.textContent='ادخل';m.textContent='تعذّر الاتصال. تأكدوا من الإنترنت.';});};
+  app.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{const i=+b.dataset.st;if(!isOpen(i)&&!done(i))return;
+    for(let k=0;k<i;k++)if(!done(k)){b.querySelector('.tag').textContent='أكملوا المحطة '+(k+1)+' أولًا';return;}
+    go('station',{edit:i});});
+  app.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{const p=b.dataset.mode.split(':');S.mode[+p[0]]=p[1];save();render();});
+  app.querySelectorAll('[data-dt]').forEach(inp=>inp.onchange=()=>{S.dates[+inp.dataset.dt]=inp.value;save();render();});
+  app.querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>go('card',{cardId:+b.dataset.card}));
+  app.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>go('station',{edit:+b.dataset.edit}));
+  app.querySelectorAll('[data-chips]').forEach(g=>g.querySelectorAll('.ch').forEach(c=>c.onclick=()=>{
+    if(g.dataset.multi)c.setAttribute('aria-pressed',c.getAttribute('aria-pressed')!=='true');
+    else g.querySelectorAll('.ch').forEach(x=>x.setAttribute('aria-pressed',x===c));}));
+  const sg=document.getElementById('sugg');if(sg)sg.querySelectorAll('button').forEach(b=>b.onclick=()=>{document.getElementById('name').value=b.textContent;});
+  const ac=document.getElementById('addc');
+  if(ac){const box=document.getElementById('cmts');
+    const wire=()=>box.querySelectorAll('.rm').forEach(b=>b.onclick=()=>{if(box.children.length>1)b.closest('.cm').remove();});
+    wire();ac.onclick=()=>{box.insertAdjacentHTML('beforeend',cmtRow({t:'',w:''}));wire();box.lastElementChild.querySelector('textarea').focus();};}
+  const phf=document.getElementById('phf');
+  if(phf)phf.onchange=async()=>{const m=document.getElementById('phm'),box=document.getElementById('thumbs');const fs=[...phf.files];let n=0;
+    S.team.a=S.team.a||{};S.draftPhotos=S.draftPhotos||((S.team.a[4]||{}).photos||[]).slice();
+    for(const f of fs){m.textContent='جارٍ رفع الصورة '+(++n)+' من '+fs.length+'…';
+      try{const b=await shrink(f);const r=await apiPost({action:'photo',code:S.team.code,name:f.name,data:b});
+        if(!r.ok)throw 0;S.draftPhotos.push(r.url);box.insertAdjacentHTML('beforeend','<a href="'+esc(r.url)+'" target="_blank" rel="noopener">صورة ✓</a>');}
+      catch(e){m.textContent='تعذّر رفع صورة. حاولوا مرة ثانية.';phf.value='';return;}}
+    m.textContent='رُفعت '+S.draftPhotos.length+' صور.';phf.value='';save();};
+  const sv=document.getElementById('sv');
+  if(sv)sv.onclick=()=>{const i=S.edit,val=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+    const pick=id=>{const g=app.querySelector('[data-chips="'+id+'"]');const on=[...g.querySelectorAll('.ch[aria-pressed="true"]')].map(x=>x.textContent);return g.dataset.multi?on:on[0];};
+    let a;
+    if(i===0)a={need:pick('need'),where:val('where'),problem:val('problem'),real:val('real'),verify:pick('verify')};
+    if(i===1)a={name:val('name'),goal:val('goal'),activity:val('activity'),impact:val('impact')};
+    if(i===2)a={place:val('place'),dur:pick('dur'),steps:[0,1,2].map(k=>val('step'+k)),roles:S.team.members.map((_,k)=>val('r'+k)),tools:val('tools'),prov:pick('prov'),approver:val('approver'),appr:pick('appr')};
+    if(i===3)a={before:val('before'),measures:pick('measures'),target:val('target'),thours:val('thours'),askq:val('askq')};
+    if(i===4)a={actual:val('actual'),hours:val('hours'),comments:[...app.querySelectorAll('#cmts .cm')].map(r=>({t:r.querySelector('textarea').value.trim(),w:r.querySelector('input').value.trim()})).filter(c=>c.t),changed:val('changed'),cont:pick('cont'),photos:(S.draftPhotos||((S.team.a||{})[4]||{}).photos||[]).slice()};
+    const msg=document.getElementById('msg');
+    const ok=Object.values(a).every(v=>Array.isArray(v)?v.length&&v.every(Boolean):!!v);
+    if(!ok){msg.textContent='أكملوا كل الحقول أولًا.';msg.hidden=false;return;}
+    if(i===4&&a.photos.length<2){msg.textContent='ارفعوا صورتين على الأقل.';msg.hidden=false;return;}
+    sv.disabled=true;sv.textContent='جارٍ الحفظ…';
+    apiPost({action:'save',code:S.team.code,station:i,answers:a}).then(r=>{if(!r.ok)throw 0;
+      const before=stage();S.team=r.team;S.draftPhotos=null;
+      if(stage()>before)S.grewFrom=before;
+      if(i>=1&&i<=3){go('card',{cardId:i});confetti();}else go('home');
+      toast(i===4?'وصل مشروعكم ✓':'حُفظت المحطة ✓');
+    }).catch(()=>{sv.disabled=false;sv.textContent='احفظوا مرة ثانية';msg.textContent='تعذّر الحفظ. تأكدوا من الإنترنت وحاولوا مرة ثانية.';msg.hidden=false;});
+  };
+  if(S.screen==='home'&&S.grewFrom!=null){const from=S.grewFrom;S.grewFrom=null;save();
+    const p=app.querySelector('.hhead .plant');if(p){p.outerHTML=plant(from);const n=stage();requestAnimationFrame(()=>requestAnimationFrame(()=>{const q=app.querySelector('.hhead .plant');q.querySelector('.stem').style.strokeDashoffset=100-n*20;q.querySelectorAll('.grow').forEach(g=>g.classList.toggle('on',n>=+g.dataset.min&&n<=+g.dataset.max));}));}
+    if(stage()===5)setTimeout(confetti,700);}
+}
+render();
+loadConfig();
+})();
+</script>
+
+</body></html>
