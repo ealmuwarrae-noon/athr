@@ -36,6 +36,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:32px}
 .logo{height:24px;width:auto;color:var(--fg)}
 .back{border:0;background:var(--soft);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
+.exit{margin-inline-start:auto;border:0;background:rgba(255,255,255,.85);color:var(--fg);border-radius:999px;padding:5px 14px;font-size:14px;font-weight:600}
+#exitsheet{position:fixed;inset:0;background:rgba(0,0,0,.38);display:flex;align-items:flex-end;justify-content:center;z-index:50;padding:16px}
+.sheet{background:var(--card);border-radius:22px;padding:20px 18px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:10px;text-align:center}
+.sheet h3{margin:0;font-size:19px}.sheet p{margin:0;color:var(--mut);font-size:15px}
+.code.sm{font-size:30px;margin:4px 0}
 .demo{font-size:12px;color:var(--mut);background:var(--soft);padding:2px 10px;border-radius:999px}
 .steps{display:flex;gap:6px}
 .steps i{flex:1;height:5px;border-radius:9px;background:var(--line)}
@@ -383,7 +388,15 @@ const dl=i=>fmtD(S.dates[i]);
 function lockNote(i){if(S.mode[i]==='closed')return 'مقفلة حاليًا';if(!S.dates[i])return 'لم يُحدَّد موعدها بعد';return 'تُفتح '+dl(i)+' · '+inDays(daysTo(S.dates[i]));}
 const done=i=>!!(S.team&&S.team.a&&S.team.a[i]);
 const stage=()=>S.team?[0,1,2,3,4].filter(done).length:0;
-function go(scr,extra){Object.assign(S,extra||{});S.screen=scr;save();render();scrollTo({top:0,behavior:reduce?'auto':'smooth'});}
+function go(scr,extra,noPush){Object.assign(S,extra||{});if(!noPush&&scr!==S.screen){try{history.pushState({s:scr},'');}catch(e){}}S.screen=scr;save();render();scrollTo({top:0,behavior:reduce?'auto':'smooth'});}
+try{history.replaceState({s:S.screen},'');}catch(e){}
+addEventListener('popstate',e=>{const t=(e.state&&e.state.s)||(S.team?'home':'welcome');go(t,null,true);});
+function askExit(){let d=document.getElementById('exitsheet');if(!d){d=document.createElement('div');d.id='exitsheet';document.body.appendChild(d);}
+  d.innerHTML='<div class="sheet" dir="rtl" role="dialog" aria-modal="true"><h3>الخروج من الفريق؟</h3><p>بياناتكم محفوظة. للعودة ادخلوا برمز الفريق:</p><div class="code sm">'+S.team.code+'</div>'+
+  '<button class="btn" id="exYes">خروج</button><button class="btn ghost" id="exNo">إلغاء</button></div>';d.hidden=false;
+  d.onclick=e=>{if(e.target===d)d.hidden=true;};
+  document.getElementById('exNo').onclick=()=>d.hidden=true;
+  document.getElementById('exYes').onclick=()=>{d.hidden=true;const keep={dates:S.dates,mode:S.mode};S=Object.assign(fresh(),keep);save();try{history.replaceState({s:'welcome'},'');}catch(e){}render();toast('تم الخروج. رمز فريقكم يرجعكم في أي وقت.');};}
 
 const app=document.getElementById('app');
 function bar(back){return '<div class="bar">'+(back?'<button class="back" data-back="'+back+'">رجوع</button>':LOGO)+'</div>';}
@@ -426,13 +439,13 @@ V.join=()=>bar('welcome')+
  '<div class="card" style="display:flex;flex-direction:column;gap:12px"><input class="in" id="jcode" inputmode="numeric" maxlength="4" placeholder="مثال: 4821" style="font-size:24px;text-align:center;letter-spacing:6px;direction:ltr">'+
  '<button class="btn" id="jgo">ادخل</button><p class="note" id="jmsg">اطلب الرمز من قائد فريقك.</p></div>';
 
-V.code=()=>bar()+
+V.code=()=>'<div class="bar">'+LOGO+'<button class="back" data-exit>خروج</button></div>'+
  '<div class="hero"><span class="pill">'+esc(S.team.name)+'</span>'+plant(0)+'<h2 class="title">فريقكم جاهز</h2><p class="sub">هذا رمز فريقكم. به يدخل أي عضو ويعدّل من جواله.</p><div class="code">'+S.team.code+'</div></div>'+
  '<button class="btn" data-go="home">ابدأ الرحلة</button>';
 
 V.home=()=>{const st=stage(),nx=STATIONS.findIndex((_,i)=>!done(i));
  const ini=S.team.members.map(m=>'<i title="'+esc(m)+'">'+esc(m.trim().charAt(0))+'</i>').join('');
- const head='<div class="hhead"><div class="ring"></div><div class="ht">'+LOGO+'<span>برنامج أثر · رمز '+S.team.code+'</span></div>'+
+ const head='<div class="hhead"><div class="ring"></div><div class="ht">'+LOGO+'<span>برنامج أثر · رمز '+S.team.code+'</span><button class="exit" data-exit>خروج</button></div>'+
   '<div class="hero2"><div class="txt"><small>'+esc(S.lab[0])+' · '+esc(S.city)+'</small><h2>'+esc(S.team.name)+'</h2>'+
   '<div class="pct"><b class="num">'+(st*20)+'%</b><span>من الرحلة</span></div><div class="avs">'+ini+'</div><span class="stg2">'+STAGES[st]+'</span></div>'+plant(st)+'</div></div>';
  const X=[72,30,68,32,64],GAP=150,TOP=70,H=TOP+GAP*5+40;
@@ -527,6 +540,7 @@ function render(){
 function bind(){
   app.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
   app.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>go(b.dataset.back));
+  app.querySelectorAll('[data-exit]').forEach(b=>b.onclick=askExit);
   app.querySelectorAll('[data-region]').forEach(p=>{const f=()=>go('city',{region:p.dataset.region});p.onclick=f;p.onkeydown=e=>{if(e.key==='Enter')f();};});
   app.querySelectorAll('[data-pick]').forEach(g=>{const f=e=>{e.stopPropagation();const p=g.dataset.pick.split('|');go('team',{region:p[0],city:p[1],lab:LABS[p[0]][p[1]][+p[2]]});};g.onclick=f;g.onkeydown=e=>{if(e.key==='Enter')f(e);};});
   app.querySelectorAll('[data-city]').forEach(b=>b.onclick=()=>go('lab',{city:b.dataset.city}));
