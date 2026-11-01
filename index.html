@@ -550,7 +550,9 @@ function bind(){
   app.querySelectorAll('[data-lab]').forEach(b=>b.onclick=()=>go('team',{lab:LABS[S.region][S.city][+b.dataset.lab]}));
   const mk=document.getElementById('mk');
   if(mk)mk.onclick=()=>{const n=document.getElementById('tname').value.trim();const ms=[0,1,2,3,4,5].map(i=>document.getElementById('m'+i).value.trim()).filter(Boolean);
+    const ar=t=>/^[\u0600-\u06FF\s]+$/.test(t);
     if(!n||ms.length<3){mk.textContent=!n?'اكتبوا اسم الفريق':'أضيفوا 3 أعضاء على الأقل';setTimeout(()=>mk.textContent='أنشئ الفريق',1600);return;}
+    if(!ar(n)||!ms.every(ar)){toast('اكتبوا اسم الفريق وأسماء الأعضاء بالحروف العربية فقط.',1);return;}
     mk.disabled=true;mk.textContent='جارٍ إنشاء الفريق…';
     apiPost({action:'create',team:{name:n,members:ms,region:S.region,city:S.city,lab:S.lab}}).then(r=>{
       if(!r.ok)throw 0;go('code',{team:r.team});}).catch(()=>{mk.disabled=false;mk.textContent='أنشئ الفريق';toast('تعذّر الاتصال. تأكدوا من الإنترنت وحاولوا مرة ثانية.',1);});};
