@@ -47,6 +47,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .steps i.on{background:var(--athr)}
 .eyebrow{font-size:13px;font-weight:600;color:var(--athrtx)}
 .title{font-size:24px;line-height:1.4}
+.sintro{margin:8px 0 0;background:var(--athrlt);color:var(--fg);border-radius:14px;padding:10px 14px;font-size:15px;line-height:1.7}
 .sub{color:var(--mut);font-size:15px}
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
@@ -329,11 +330,11 @@ const LABS={
  'SA-09':{'جازان':[['معمل جازان · بنين','جمعية غراس']]}
 };
 const STATIONS=[
- {n:'من يحتاجنا؟',d:'الثلاثاء 27 أكتوبر'},
- {n:'اختيار المبادرة',d:'الأربعاء 28 أكتوبر'},
- {n:'خطة التنفيذ وتوزيع الأدوار',d:'الثلاثاء 3 نوفمبر'},
- {n:'خطة قياس الأثر',d:'الأربعاء 4 نوفمبر'},
- {n:'توثيق يوم العمل التطوعي',d:'الاثنين 23 نوفمبر',day:true}
+ {n:'من يحتاجنا؟',d:'الثلاثاء 27 أكتوبر',x:'اختاروا فئة قريبة منكم، واعرفوا مشكلتها الحقيقية من أصحابها أنفسهم.'},
+ {n:'اختيار المبادرة',d:'الأربعاء 28 أكتوبر',x:'حوّلوا الاحتياج الذي وجدتموه إلى مبادرة واحدة تستطيعون تنفيذها في يوم واحد.'},
+ {n:'خطة التنفيذ وتوزيع الأدوار',d:'الثلاثاء 3 نوفمبر',x:'حدّدوا المكان والخطوات ودور كل عضو، ومن يوافق لكم على التنفيذ.'},
+ {n:'خطة قياس الأثر',d:'الأربعاء 4 نوفمبر',x:'قبل التنفيذ: صِفوا الوضع الحالي، وحدّدوا كيف ستعرفون أن مبادرتكم غيّرت شيئًا.'},
+ {n:'توثيق يوم العمل التطوعي',d:'الاثنين 23 نوفمبر',day:true,x:'بعد يوم العمل التطوعي: اكتبوا ما حدث فعلًا، وارفعوا صوركم.'}
 ];
 const DEF_DATES=['2026-10-27','2026-10-28','2026-11-03','2026-11-04','2026-11-23'];
 const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'],MONTHS=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
@@ -475,7 +476,7 @@ V.home=()=>{const st=stage(),nx=STATIONS.findIndex((_,i)=>!done(i));
   '<div class="rgoal" style="top:'+(TOP+GAP*5)+'px">'+plant(5,'')+'<small>'+(st===5?'تفتّحت زهرة مبادرتكم':'تتفتّح يوم العمل التطوعي')+'</small></div></div>';
  const outs=[[1,'بطاقة مبادرتنا','✎'],[2,'خطة التنفيذ','☷'],[3,'خطة قياس الأثر','◎'],[4,'تقرير الأثر','★']];
  const outsH='<div class="sect">مخرجات الفريق</div><div class="outs2">'+outs.map(o=>{const ok=done(o[0]);
-   return '<button class="o2'+(ok?'':' off')+'" '+(ok?(o[0]===4?'data-go="report"':'data-card="'+o[0]+'"'):'disabled')+'><span class="ico">'+o[2]+'</span><b>'+o[1]+'</b><small>'+(ok?'جاهزة · افتحوها':'بعد '+(o[0]===4?'يوم التطبيق':'المحطة '+(o[0]+1)))+'</small></button>';}).join('')+
+   return '<button class="o2'+(ok?'':' off')+'" '+(ok?(o[0]===4?'data-go="report"':'data-card="'+o[0]+'"'):'disabled')+'><span class="ico">'+o[2]+'</span><b>'+o[1]+'</b><small>'+(ok?'جاهزة · افتحوها':'بعد '+(o[0]===4?'محطة التوثيق':'المحطة '+(o[0]+1)))+'</small></button>';}).join('')+
    '</div><button class="btn ghost" data-go="report" style="font-size:15px">تقرير الأثر كما وصل الآن · '+st+' من 5</button>';
  const garden='<div class="sect">حديقة '+esc(S.lab[0])+'</div><div class="mini">'+
  [[esc(S.team.name),st,1]].concat(GARDEN.filter(t=>t.lab===S.lab[0]&&t.name!==S.team.name).map(t=>[esc(t.name),Math.min(5,+t.stage||0)])).map(t=>'<div class="'+(t[2]?'me':'')+'">'+plant(t[1],'')+t[0]+'<small>'+STAGES[t[1]]+'</small></div>').join('')+'</div>';
@@ -525,12 +526,12 @@ V.station=()=>{const i=S.edit,s=STATIONS[i],a=(S.team.a&&S.team.a[i])||{},A=S.te
    '<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">هل تستمر المبادرة؟'+chips('cont',CONT,a.cont)+'</div>'+'<div class="f" style="font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:8px">صور يوم التطبيق<small style="font-weight:400;color:var(--mut);font-size:13px">ارفعوا صورتين على الأقل من التنفيذ. تُحفظ في مجلد فريقكم.</small>'+
    '<div class="thumbs" id="thumbs">'+((a.photos||[]).map(u=>'<a href="'+esc(u)+'" target="_blank" rel="noopener">صورة ✓</a>').join(''))+'</div>'+
    '<label class="btn ghost" style="font-size:15px;text-align:center;cursor:pointer">+ أضيفوا صورًا<input type="file" id="phf" accept="image/*" multiple hidden></label><p class="note" id="phm"></p></div>';
- return bar('home')+'<div><div class="eyebrow">'+(s.day?'يوم التطبيق':'المحطة '+(i+1)+' من 4')+' · '+dl(i)+'</div><h2 class="title">'+s.n+'</h2></div>'+
+ return bar('home')+'<div><div class="eyebrow">'+(s.day?'المحطة الأخيرة':'المحطة '+(i+1)+' من 5')+' · '+dl(i)+'</div><h2 class="title">'+s.n+'</h2>'+(s.x?'<p class="sintro">'+s.x+'</p>':'')+'</div>'+
   '<div class="card" style="display:flex;flex-direction:column;gap:14px">'+body+'</div><button class="btn" id="sv">'+(done(i)?'احفظ التعديل':'أكمل المحطة')+'</button><p class="note" id="msg" hidden>أكملوا كل الحقول أولًا.</p>';};
 
 const CARDS={
  1:{t:'بطاقة مبادرتنا',ses:'الحصة الثانية',cols:A=>[[['اسم الفريق',S.team.name],['اسم المبادرة',A[1].name],['المشكلة',A[0].problem],['الاحتياج الحقيقي',A[0].real],['كيف تأكدنا منه؟',A[0].verify.join('، ')]],[['المستفيدون',A[0].where],['هدف المبادرة',A[1].goal],['النشاط المقترح',A[1].activity],['الأثر المتوقع',A[1].impact]]]},
- 2:{t:'خطة التنفيذ',ses:'الحصة الثالثة',cols:A=>[[['المكان',A[2].place],['اليوم والمدة',dl(4)+' · '+A[2].dur],['الخطوة 1',A[2].steps[0]],['الخطوة 2',A[2].steps[1]],['الخطوة 3',A[2].steps[2]]],[['الأدوار',S.team.members.map((m,k)=>m+': '+A[2].roles[k]).join(' · ')],['ما نحتاجه',A[2].tools],['يوفّره',A[2].prov.join('، ')],['الموافقة',A[2].approver+' · '+A[2].appr]]]},
+ 2:{t:'خطة التنفيذ',ses:'الحصة الثالثة',cols:A=>[[['المكان',A[2].place],['اليوم والمدة','الأحد 22 نوفمبر · '+A[2].dur],['الخطوة 1',A[2].steps[0]],['الخطوة 2',A[2].steps[1]],['الخطوة 3',A[2].steps[2]]],[['الأدوار',S.team.members.map((m,k)=>m+': '+A[2].roles[k]).join(' · ')],['ما نحتاجه',A[2].tools],['يوفّره',A[2].prov.join('، ')],['الموافقة',A[2].approver+' · '+A[2].appr]]]},
  3:{t:'خطة قياس الأثر',ses:'الحصة الرابعة',cols:A=>[[['الوضع قبل المبادرة',A[3].before],['الأثر المتوقع',A[1].impact],['أدوات القياس',A[3].measures.join('، ')]],[['المستفيدون المستهدفون',A[3].target],['ساعات التطوع لكل عضو',A[3].thours],['سؤال الأثر',A[3].askq]]]}
 };
 V.card=()=>{const id=S.cardId||1,c=CARDS[id],A=S.team.a,f=x=>'<div class="bf"><span>'+x[0]+'</span><b>'+esc(x[1])+'</b></div>';
@@ -631,7 +632,7 @@ const ML=[
  ['المبادرة',[['name','اسم المبادرة'],['goal','الهدف'],['activity','النشاط'],['impact','الأثر المتوقع']]],
  ['خطة التنفيذ',[['place','المكان'],['dur','المدة'],['steps','الخطوات'],['roles','الأدوار'],['tools','الاحتياجات'],['prov','من يوفّرها'],['approver','الموافقة من'],['appr','حالة الموافقة']]],
  ['قياس الأثر',[['before','الوضع قبل المبادرة'],['measures','أدوات القياس'],['target','المستفيدون المستهدفون'],['thours','ساعات التطوع المستهدفة'],['askq','سؤال الأثر']]],
- ['يوم التطبيق',[['actual','المستفيدون فعليًا'],['hours','ساعات التطوع'],['comments','تعليقات المستفيدين'],['changed','ما اختلف عن الخطة'],['cont','استمرار المبادرة'],['photos','الصور']]]];
+ ['التوثيق',[['actual','المستفيدون فعليًا'],['hours','ساعات التطوع'],['comments','تعليقات المستفيدين'],['changed','ما اختلف عن الخطة'],['cont','استمرار المبادرة'],['photos','الصور']]]];
 function mval(t,i,k,v){
   if(v==null||v==='')return '<i class="mx">—</i>';
   if(k==='roles'&&Array.isArray(v))return '<ul>'+t.members.map((m,j)=>'<li><b>'+esc(m)+':</b> '+esc(v[j]||'—')+'</li>').join('')+'</ul>';
