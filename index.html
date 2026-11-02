@@ -58,7 +58,20 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 
 /* hero */
 .hero{background:var(--sky);border-radius:24px;padding:22px 18px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
-.hero .pill{background:var(--athr);color:#fff;font-size:13px;font-weight:600;padding:3px 12px;border-radius:999px}
+.hero .pill2{background:var(--athrlt);color:var(--athrtx);font-size:13px;font-weight:600;padding:3px 12px;border-radius:999px}
+.msum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.msum div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;text-align:center;display:flex;flex-direction:column}
+.msum b{font-size:22px;color:var(--athrdk)}.msum span{font-size:12.5px;color:var(--mut);line-height:1.4}
+.mcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.mtop{display:flex;gap:10px;align-items:center}.mtop h3{margin:0;font-size:18px}.mtop small{color:var(--mut);font-size:12.5px}.mtop p{margin:2px 0 0;font-size:14px}
+.mpl2{width:58px;height:70px;flex:none}
+.mdots{display:flex;gap:6px}.mdots span{flex:1;height:30px;border-radius:9px;background:var(--soft);color:var(--mut);display:grid;place-items:center;font-size:13px;font-weight:600}
+.mdots span.ok{background:var(--teal);color:#fff}.mdots span.due{background:var(--athrlt);color:var(--athrtx);outline:1.5px dashed var(--athr)}
+.mcard details{border-top:1px solid var(--line);padding-top:6px}.mcard summary{font-weight:600;cursor:pointer;padding:4px 0}
+.mcard dl{margin:4px 0 6px;display:grid;gap:4px}.mcard dt{font-size:12.5px;color:var(--mut)}.mcard dd{margin:0 0 4px;font-size:14.5px}
+.mcard dd ul,.mcard dd ol{margin:0;padding-inline-start:18px}.mx{color:var(--mut);font-style:normal}
+.mnot{border-top:1px solid var(--line);padding-top:6px;font-size:14px;color:var(--mut)}.mnot b{color:var(--athrtx);font-weight:600}
+.pill{background:var(--athr);color:#fff;font-size:13px;font-weight:600;padding:3px 12px;border-radius:999px}
 .hero h1{font-size:30px}
 .hero .plant{max-width:180px}
 
@@ -611,8 +624,50 @@ function bind(){
     const p=app.querySelector('.hhead .plant');if(p){p.outerHTML=plant(from);const n=stage();requestAnimationFrame(()=>requestAnimationFrame(()=>{const q=app.querySelector('.hhead .plant');q.querySelector('.stem').style.strokeDashoffset=100-n*20;q.querySelectorAll('.grow').forEach(g=>g.classList.toggle('on',n>=+g.dataset.min&&n<=+g.dataset.max));}));}
     if(stage()===5)setTimeout(confetti,700);}
 }
+/* ---------- صفحة المرشد (عرض فقط) ---------- */
+const QP=new URLSearchParams(location.search);
+const ML=[
+ ['المستفيدون',[['need','المستفيدون'],['where','من هم بالتحديد'],['problem','المشكلة'],['real','الاحتياج الحقيقي'],['verify','كيف تأكدوا']]],
+ ['المبادرة',[['name','اسم المبادرة'],['goal','الهدف'],['activity','النشاط'],['impact','الأثر المتوقع']]],
+ ['خطة التنفيذ',[['place','المكان'],['dur','المدة'],['steps','الخطوات'],['roles','الأدوار'],['tools','الاحتياجات'],['prov','من يوفّرها'],['approver','الموافقة من'],['appr','حالة الموافقة']]],
+ ['قياس الأثر',[['before','الوضع قبل المبادرة'],['measures','أدوات القياس'],['target','المستفيدون المستهدفون'],['thours','ساعات التطوع المستهدفة'],['askq','سؤال الأثر']]],
+ ['يوم التطبيق',[['actual','المستفيدون فعليًا'],['hours','ساعات التطوع'],['comments','تعليقات المستفيدين'],['changed','ما اختلف عن الخطة'],['cont','استمرار المبادرة'],['photos','الصور']]]];
+function mval(t,i,k,v){
+  if(v==null||v==='')return '<i class="mx">—</i>';
+  if(k==='roles'&&Array.isArray(v))return '<ul>'+t.members.map((m,j)=>'<li><b>'+esc(m)+':</b> '+esc(v[j]||'—')+'</li>').join('')+'</ul>';
+  if(k==='steps'&&Array.isArray(v))return '<ol>'+v.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ol>';
+  if(k==='comments'&&Array.isArray(v))return '<ul>'+v.map(c=>'<li>«'+esc(c.t)+'»'+(c.w?' — '+esc(c.w):'')+'</li>').join('')+'</ul>';
+  if(k==='photos'&&Array.isArray(v))return v.map((u,j)=>'<a href="'+esc(u)+'" target="_blank" rel="noopener">صورة '+(j+1)+'</a>').join(' · ');
+  if(Array.isArray(v))return esc(v.join('، '));
+  return esc(v);}
+function mentorView(d){
+  d.stations.forEach((x,i)=>{if(i<5){S.dates[i]=x.date||'';S.mode[i]=x.mode||'auto';}});
+  const T=d.teams||[],n=T.length;
+  const cur=[0,1,2,3,4].filter(i=>isOpen(i)).pop();
+  const doneN=i=>T.filter(t=>t.a&&t.a[i]).length;
+  const sum='<div class="msum"><div><b>'+n+'</b><span>'+(n===1?'فريق':'فرق')+'</span></div>'+
+    (cur!=null?'<div><b>'+doneN(cur)+' / '+n+'</b><span>أنهوا محطة «'+STATIONS[cur].n+'»</span></div>':'')+
+    '<div><b>'+T.reduce((a,t)=>a+t.members.length,0)+'</b><span>طالب</span></div></div>';
+  const cards=T.length?T.sort((a,b)=>Object.keys(b.a||{}).length-Object.keys(a.a||{}).length).map(t=>{
+    const A=t.a||{},st=Object.keys(A).length;
+    const dots='<div class="mdots">'+STATIONS.map((x,i)=>'<span class="'+(A[i]?'ok':isOpen(i)?'due':'')+'" title="'+x.n+'">'+(A[i]?'✓':i+1)+'</span>').join('')+'</div>';
+    const det=ML.map((m,i)=>A[i]?'<details><summary>'+(i+1)+'. '+m[0]+'</summary><dl>'+m[1].map(f=>'<dt>'+f[1]+'</dt><dd>'+mval(t,i,f[0],A[i][f[0]])+'</dd>').join('')+'</dl></details>':
+      '<div class="mnot">'+(i+1)+'. '+m[0]+' · '+(isOpen(i)?'<b>لم تُنجز بعد</b>':'لم تُفتح')+'</div>').join('');
+    return '<div class="mcard"><div class="mtop">'+plant(st,'mpl2')+'<div><h3>'+esc(t.name)+'</h3><small>رمز '+t.code+' · '+t.members.length+' أعضاء</small><p>'+t.members.map(esc).join('، ')+'</p></div></div>'+dots+det+'</div>';}).join('')
+    :'<div class="card" style="text-align:center">لم يسجّل أي فريق من هذا المعمل بعد.</div>';
+  app.innerHTML='<div class="screen"><div class="bar">'+LOGO+'<span class="pill2">متابعة المرشد</span></div>'+
+   '<div><div class="eyebrow">برنامج أثر · عرض فقط</div><h2 class="title">'+esc(d.lab)+'</h2></div>'+sum+cards+
+   '<button class="btn ghost" id="mref">تحديث</button></div>';
+  document.getElementById('mref').onclick=mentorLoad;}
+function mentorLoad(){
+  app.innerHTML='<div class="screen"><div class="card" style="text-align:center">جارٍ التحميل…</div></div>';
+  apiGet({action:'lab',lab:QP.get('m'),k:QP.get('k')||''}).then(d=>{
+    if(!d.ok){app.innerHTML='<div class="screen"><div class="card" style="text-align:center">الرابط غير صحيح. تواصلوا مع فريق نون.</div></div>';return;}
+    mentorView(d);}).catch(()=>{app.innerHTML='<div class="screen"><div class="card" style="text-align:center">تعذّر الاتصال. تأكدوا من الإنترنت وحدّثوا الصفحة.</div></div>';});}
+if(QP.get('m')){mentorLoad();}else{
 render();
 loadConfig();
+}
 })();
 </script>
 
