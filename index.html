@@ -47,6 +47,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .steps i.on{background:var(--athr)}
 .eyebrow{font-size:13px;font-weight:600;color:var(--athrtx)}
 .title{font-size:24px;line-height:1.4}
+.mdel{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:flex;justify-content:flex-end}
+.mdelb{border:0;background:none;color:var(--mut);font:inherit;font-size:13px;cursor:pointer;padding:4px 6px}
+.mdelb:hover{color:#c0392b}
+.mdelq{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13.5px;width:100%}
+.mdelq span{flex:1 1 100%}
+.mdely{border:0;background:#c0392b;color:#fff;font:inherit;font-size:13px;font-weight:600;border-radius:10px;padding:6px 14px;cursor:pointer}
+.mdeln{border:1px solid var(--line);background:none;color:inherit;font:inherit;font-size:13px;border-radius:10px;padding:6px 14px;cursor:pointer}
 .editt{margin-top:8px;align-self:flex-start;border:0;background:rgba(255,255,255,.22);color:inherit;font:inherit;font-size:13px;font-weight:600;border-radius:999px;padding:4px 12px;cursor:pointer}
 .sintro{margin:8px 0 0;background:var(--athrlt);color:var(--fg);border-radius:14px;padding:10px 14px;font-size:15px;line-height:1.7}
 .sub{color:var(--mut);font-size:15px}
@@ -670,12 +677,20 @@ function mentorView(d){
     const dots='<div class="mdots">'+STATIONS.map((x,i)=>'<span class="'+(A[i]?'ok':isOpen(i)?'due':'')+'" title="'+x.n+'">'+(A[i]?'✓':i+1)+'</span>').join('')+'</div>';
     const det=ML.map((m,i)=>A[i]?'<details><summary>'+(i+1)+'. '+m[0]+'</summary><dl>'+m[1].map(f=>'<dt>'+f[1]+'</dt><dd>'+mval(t,i,f[0],A[i][f[0]])+'</dd>').join('')+'</dl></details>':
       '<div class="mnot">'+(i+1)+'. '+m[0]+' · '+(isOpen(i)?'<b>لم تُنجز بعد</b>':'لم تُفتح')+'</div>').join('');
-    return '<div class="mcard"><div class="mtop">'+plant(st,'mpl2')+'<div><h3>'+esc(t.name)+'</h3><small>رمز '+t.code+' · '+t.members.length+' أعضاء</small><p>'+t.members.map(esc).join('، ')+'</p></div></div>'+dots+det+'</div>';}).join('')
+    return '<div class="mcard"><div class="mtop">'+plant(st,'mpl2')+'<div><h3>'+esc(t.name)+'</h3><small>رمز '+t.code+' · '+t.members.length+' أعضاء</small><p>'+t.members.map(esc).join('، ')+'</p></div></div>'+dots+det+'<div class="mdel" data-del="'+t.code+'" data-nm="'+esc(t.name)+'"><button type="button" class="mdelb">حذف الفريق</button></div></div>';}).join('')
     :'<div class="card" style="text-align:center">لم يسجّل أي فريق من هذا المعمل بعد.</div>';
   app.innerHTML='<div class="screen"><div class="bar">'+LOGO+'<span class="pill2">متابعة المرشد</span></div>'+
-   '<div><div class="eyebrow">برنامج أثر · عرض فقط</div><h2 class="title">'+esc(d.lab)+'</h2></div>'+sum+cards+
+   '<div><div class="eyebrow">برنامج أثر · متابعة المعمل</div><h2 class="title">'+esc(d.lab)+'</h2></div>'+sum+cards+
    '<button class="btn ghost" id="mref">تحديث</button></div>';
-  document.getElementById('mref').onclick=mentorLoad;}
+  document.getElementById('mref').onclick=mentorLoad;
+  app.querySelectorAll('[data-del]').forEach(w=>{const code=w.dataset.del,nm=w.dataset.nm;
+    const idle=()=>{w.innerHTML='<button type="button" class="mdelb">حذف الفريق</button>';w.querySelector('button').onclick=ask;};
+    const ask=()=>{w.innerHTML='<div class="mdelq"><span>يُحذف فريق «'+nm+'» وإجاباته من صفحتك. متأكد؟</span><button type="button" class="mdely">نعم، احذف</button><button type="button" class="mdeln">تراجع</button></div>';
+      w.querySelector('.mdeln').onclick=idle;
+      w.querySelector('.mdely').onclick=()=>{const y=w.querySelector('.mdely');y.disabled=true;y.textContent='جارٍ الحذف…';
+        apiPost({action:'mdelete',lab:QP.get('m'),k:QP.get('k')||'',code:code}).then(r=>{if(!r.ok)throw 0;toast('حُذف الفريق ✓');mentorLoad();})
+        .catch(()=>{toast('تعذّر الحذف. حدّث الصفحة وحاول مرة ثانية.',1);idle();});};};
+    w.querySelector('button').onclick=ask;});}
 function mentorLoad(){
   app.innerHTML='<div class="screen"><div class="card" style="text-align:center">جارٍ التحميل…</div></div>';
   apiGet({action:'lab',lab:QP.get('m'),k:QP.get('k')||''}).then(d=>{
