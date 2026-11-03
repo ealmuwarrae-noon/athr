@@ -47,6 +47,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .steps i.on{background:var(--athr)}
 .eyebrow{font-size:13px;font-weight:600;color:var(--athrtx)}
 .title{font-size:24px;line-height:1.4}
+.editt{margin-top:8px;align-self:flex-start;border:0;background:rgba(255,255,255,.22);color:inherit;font:inherit;font-size:13px;font-weight:600;border-radius:999px;padding:4px 12px;cursor:pointer}
 .sintro{margin:8px 0 0;background:var(--athrlt);color:var(--fg);border-radius:14px;padding:10px 14px;font-size:15px;line-height:1.7}
 .sub{color:var(--mut);font-size:15px}
 
@@ -451,6 +452,13 @@ V.team=()=>bar('lab')+stepsBar(4)+
  [0,1,2,3,4,5].map(i=>'<input class="in" id="m'+i+'" maxlength="24" placeholder="العضو '+(i+1)+'">').join('')+'</div></div></div>'+
  '<button class="btn" id="mk">أنشئ الفريق</button>';
 
+V.editteam=()=>{const t=S.team;return bar('home')+
+ '<div><div class="eyebrow">رمز الفريق '+t.code+' · لا يتغيّر</div><h2 class="title">عدّلوا فريقكم</h2><p class="sub">غيّروا الاسم أو أضيفوا أعضاء. إجاباتكم في المحطات تبقى كما هي.</p></div>'+
+ '<div class="card" style="display:flex;flex-direction:column;gap:14px"><label class="f">اسم الفريق<input class="in" id="tname" maxlength="30" value="'+esc(t.name)+'"></label>'+
+ '<div class="f" style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:15px">أعضاء الفريق <small style="font-weight:400;color:var(--mut);font-size:13px">من 3 إلى 6 أعضاء · اتركوا الخانة فارغة لحذف عضو</small><div class="members">'+
+ [0,1,2,3,4,5].map(i=>'<input class="in" id="m'+i+'" maxlength="24" placeholder="العضو '+(i+1)+'" value="'+esc(t.members[i]||'')+'">').join('')+'</div></div></div>'+
+ '<button class="btn" id="ed">احفظوا التعديل</button>';};
+
 V.join=()=>bar('welcome')+
  '<div><h2 class="title">ادخل رمز فريقك</h2><p class="sub">الرمز من 4 أرقام، ظهر لفريقك عند إنشائه.</p></div>'+
  '<div class="card" style="display:flex;flex-direction:column;gap:12px"><input class="in" id="jcode" inputmode="numeric" maxlength="4" placeholder="مثال: 4821" style="font-size:24px;text-align:center;letter-spacing:6px;direction:ltr">'+
@@ -464,7 +472,7 @@ V.home=()=>{const st=stage(),nx=STATIONS.findIndex((_,i)=>!done(i));
  const ini=S.team.members.map(m=>'<i title="'+esc(m)+'">'+esc(m.trim().charAt(0))+'</i>').join('');
  const head='<div class="hhead"><div class="ring"></div><div class="ht">'+LOGO+'<span>برنامج أثر · رمز '+S.team.code+'</span><button class="exit" data-exit>خروج</button></div>'+
   '<div class="hero2"><div class="txt"><small>'+esc(S.lab[0])+' · '+esc(S.city)+'</small><h2>'+esc(S.team.name)+'</h2>'+
-  '<div class="pct"><b class="num">'+(st*20)+'%</b><span>من الرحلة</span></div><div class="avs">'+ini+'</div><span class="stg2">'+STAGES[st]+'</span></div>'+plant(st)+'</div></div>';
+  '<div class="pct"><b class="num">'+(st*20)+'%</b><span>من الرحلة</span></div><div class="avs">'+ini+'</div><button class="editt" data-go="editteam">✎ عدّلوا الفريق</button><span class="stg2">'+STAGES[st]+'</span></div>'+plant(st)+'</div></div>';
  const X=[72,30,68,32,64],GAP=150,TOP=70,H=TOP+GAP*5+40;
  let d='M'+X[0]+' '+TOP;for(let i=1;i<=5;i++){const x0=X[i-1],y0=TOP+GAP*(i-1),x1=i<5?X[i]:50,y1=TOP+GAP*i;d+=' C'+x0+' '+(y0+GAP*.55)+' '+x1+' '+(y1-GAP*.55)+' '+x1+' '+y1;}
  const road='<div class="sect">طريق الرحلة</div><div class="road" style="height:'+H+'px"><svg viewBox="0 0 100 '+H+'" preserveAspectRatio="none" aria-hidden="true">'+
@@ -570,6 +578,14 @@ function bind(){
     mk.disabled=true;mk.textContent='جارٍ إنشاء الفريق…';
     apiPost({action:'create',team:{name:n,members:ms,region:S.region,city:S.city,lab:S.lab}}).then(r=>{
       if(!r.ok)throw 0;go('code',{team:r.team});}).catch(()=>{mk.disabled=false;mk.textContent='أنشئ الفريق';toast('تعذّر الاتصال. تأكدوا من الإنترنت وحاولوا مرة ثانية.',1);});};
+  const ed=document.getElementById('ed');
+  if(ed)ed.onclick=()=>{const n=document.getElementById('tname').value.trim();const ms=[0,1,2,3,4,5].map(i=>document.getElementById('m'+i).value.trim()).filter(Boolean);
+    const ar=t=>/^[\u0600-\u06FF\s]+$/.test(t);const lbl='احفظوا التعديل';
+    if(!n||ms.length<3){ed.textContent=!n?'اكتبوا اسم الفريق':'الفريق 3 أعضاء على الأقل';setTimeout(()=>ed.textContent=lbl,1600);return;}
+    if(!ar(n)||!ms.every(ar)){toast('اكتبوا اسم الفريق وأسماء الأعضاء بالحروف العربية فقط.',1);return;}
+    ed.disabled=true;ed.textContent='جارٍ الحفظ…';
+    apiPost({action:'edit',code:S.team.code,name:n,members:ms}).then(r=>{
+      if(!r.ok)throw 0;S.team=r.team;save();go('home');toast('حُفظ التعديل ✓');}).catch(()=>{ed.disabled=false;ed.textContent=lbl;toast('تعذّر الحفظ. تأكدوا من الإنترنت وحاولوا مرة ثانية.',1);});};
   const jg=document.getElementById('jgo');
   if(jg)jg.onclick=()=>{const c=document.getElementById('jcode').value.trim();
     const m=document.getElementById('jmsg');if(!/^\d{4}$/.test(c)){m.textContent='الرمز 4 أرقام.';return;}
