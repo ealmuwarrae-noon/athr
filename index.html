@@ -59,6 +59,19 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .afil button{flex:none;border:1px solid var(--line);background:var(--card);color:inherit;font:inherit;font-size:13px;border-radius:99px;padding:6px 12px;cursor:pointer}
 .afil button.on{background:var(--athrdk);border-color:var(--athrdk);color:#fff}.afil button.z{opacity:.5}
 .mcards{display:flex;flex-direction:column;gap:12px}
+.atiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.atile{border:1px solid var(--line);background:var(--card);color:inherit;font:inherit;border-radius:18px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;cursor:pointer;transition:transform .12s,border-color .12s}
+.atile:hover{transform:translateY(-2px);border-color:var(--athr)}
+.atile .atpl{width:56px;height:auto}
+.atile b{font-size:15px;line-height:1.35}.atile small{font-size:12px;color:var(--mut)}
+.adots{display:flex;gap:4px;margin-top:4px}.adots i{width:14px;height:6px;border-radius:99px;background:var(--soft)}
+.adots i.ok{background:#1f7a5a}.adots i.due{background:var(--athrlt);outline:1px dashed var(--athr)}
+.adet{position:fixed;inset:0;z-index:50;background:rgba(20,20,24,.45);display:flex;align-items:flex-end;justify-content:center}
+.adet[hidden]{display:none}
+.adetin{position:relative;background:var(--bg);width:100%;max-width:640px;max-height:88vh;overflow:auto;border-radius:22px 22px 0 0;padding:44px 14px calc(16px + env(safe-area-inset-bottom,0px))}
+.adx{position:absolute;top:10px;left:12px;border:0;background:var(--soft);color:inherit;width:32px;height:32px;border-radius:50%;font-size:15px;cursor:pointer}
+@media (min-width:900px){.adet{align-items:center}.adetin{border-radius:22px;max-height:84vh}.atiles{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}}
+@media (prefers-reduced-motion:reduce){.atile{transition:none}}
 @media (min-width:900px){.screen.adm{max-width:1100px}.adm .mcards{display:grid;grid-template-columns:1fr 1fr;align-items:start}.adm .afil{flex-wrap:wrap;overflow:visible}}
 .mdel{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
 .medb{border:1px solid var(--line);background:none;color:inherit;font:inherit;font-size:13px;font-weight:600;border-radius:10px;padding:6px 12px;cursor:pointer}
@@ -706,13 +719,21 @@ function mentorView(d){
     const dots='<div class="mdots">'+STATIONS.map((x,i)=>'<span class="'+(A[i]?'ok':isOpen(i)?'due':'')+'" title="'+x.n+'">'+(A[i]?'✓':i+1)+'</span>').join('')+'</div>';
     const det=ML.map((m,i)=>A[i]?'<details><summary>'+(i+1)+'. '+m[0]+'</summary><dl>'+m[1].map(f=>'<dt>'+f[1]+'</dt><dd>'+mval(t,i,f[0],A[i][f[0]])+'</dd>').join('')+'</dl></details>':
       '<div class="mnot">'+(i+1)+'. '+m[0]+' · '+(isOpen(i)?'<b>لم تُنجز بعد</b>':'لم تُفتح')+'</div>').join('');
-    return '<div class="mcard"><div class="mtop">'+plant(st,'mpl2')+'<div><h3>'+esc(t.name)+'</h3><small>'+(ADMIN&&t.lab?esc(t.lab[0])+' · ':'')+'رمز '+t.code+' · '+t.members.length+' أعضاء</small><p>'+t.members.map(esc).join('، ')+'</p></div></div>'+dots+det+'<div class="medw" data-ed="'+t.code+'" hidden></div><div class="mdel" data-del="'+t.code+'" data-nm="'+esc(t.name)+'"><button type="button" class="medb" data-edopen="'+t.code+'">✎ تعديل الفريق</button><button type="button" class="mdelb">حذف الفريق</button></div></div>';}).join('')
+    return '<div class="mcard" data-card="'+t.code+'"><div class="mtop">'+plant(st,'mpl2')+'<div><h3>'+esc(t.name)+'</h3><small>'+(ADMIN&&t.lab?esc(t.lab[0])+' · ':'')+'رمز '+t.code+' · '+t.members.length+' أعضاء</small><p>'+t.members.map(esc).join('، ')+'</p></div></div>'+dots+det+'<div class="medw" data-ed="'+t.code+'" hidden></div><div class="mdel" data-del="'+t.code+'" data-nm="'+esc(t.name)+'"><button type="button" class="medb" data-edopen="'+t.code+'">✎ تعديل الفريق</button><button type="button" class="mdelb">حذف الفريق</button></div></div>';}).join('')
     :'<div class="card" style="text-align:center">لم يسجّل أي فريق من هذا المعمل بعد.</div>';
+  const atiles=!ADMIN?'':(T.length?'<div class="atiles">'+T.map(t=>{const A=t.a||{},st=Object.keys(A).length;
+      return '<button type="button" class="atile" data-open="'+t.code+'">'+plant(st,'atpl')+'<b>'+esc(t.name)+'</b><small>'+esc((t.lab?t.lab[0]:'').replace('معمل ',''))+' · '+t.members.length+' أعضاء</small><span class="adots">'+STATIONS.map((x,i)=>'<i class="'+(A[i]?'ok':isOpen(i)?'due':'')+'"></i>').join('')+'</span></button>';}).join('')+'</div>':'<div class="card" style="text-align:center">لا توجد فرق في هذا المعمل بعد.</div>')+
+      '<div id="apool" hidden>'+(T.length?cards:'')+'</div><div class="adet" id="adet" hidden><div class="adetin"><button type="button" class="adx" aria-label="إغلاق">✕</button><div id="adslot"></div></div></div>';
   app.innerHTML='<div class="screen'+(ADMIN?' adm wide':'')+'"><div class="bar">'+LOGO+'<span class="pill2">'+(ADMIN?'لوحة الإدارة':'متابعة المرشد')+'</span></div>'+
-   '<div><div class="eyebrow">برنامج أثر · '+(ADMIN?'كل المعامل':'متابعة المعمل')+'</div><h2 class="title">'+(ADMIN?(AF?esc(AF):'مشاريع الفرق'):esc(d.lab))+'</h2></div>'+(ADMIN?adm:sum)+'<div class="mcards">'+cards+'</div>'+
+   '<div><div class="eyebrow">برنامج أثر · '+(ADMIN?'كل المعامل':'متابعة المعمل')+'</div><h2 class="title">'+(ADMIN?(AF?esc(AF):'مشاريع الفرق'):esc(d.lab))+'</h2></div>'+(ADMIN?adm:sum)+(ADMIN?atiles:'<div class="mcards">'+cards+'</div>')+
    '<button class="btn ghost" id="mref">تحديث</button></div>';
   document.getElementById('mref').onclick=mentorLoad;
   app.querySelectorAll('[data-af]').forEach(b=>b.onclick=()=>{AF=b.dataset.af;mentorView(d);});
+  if(ADMIN){const det=document.getElementById('adet'),slot=document.getElementById('adslot'),pool=document.getElementById('apool');
+    const close=()=>{[...slot.children].forEach(c=>pool.appendChild(c));det.hidden=true;document.body.style.overflow='';};
+    app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const c=pool.querySelector('[data-card="'+b.dataset.open+'"]');if(!c)return;slot.appendChild(c);det.hidden=false;document.body.style.overflow='hidden';det.querySelector('.adetin').scrollTop=0;});
+    det.querySelector('.adx').onclick=close;det.onclick=e=>{if(e.target===det)close();};
+    document.onkeydown=e=>{if(e.key==='Escape'&&!det.hidden)close();};}
   app.querySelectorAll('[data-del]').forEach(w=>{const code=w.dataset.del,nm=w.dataset.nm;
     const idle=()=>{w.innerHTML='<button type="button" class="medb" data-edopen="'+code+'">✎ تعديل الفريق</button><button type="button" class="mdelb">حذف الفريق</button>';w.querySelector('.mdelb').onclick=ask;w.querySelector('.medb').onclick=()=>openEd(code);};
     const ask=()=>{w.innerHTML='<div class="mdelq"><span>يُحذف فريق «'+nm+'» وإجاباته من صفحتك. متأكد؟</span><button type="button" class="mdely">نعم، احذف</button><button type="button" class="mdeln">تراجع</button></div>';
