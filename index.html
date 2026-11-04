@@ -47,6 +47,19 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .steps i.on{background:var(--athr)}
 .eyebrow{font-size:13px;font-weight:600;color:var(--athrtx)}
 .title{font-size:24px;line-height:1.4}
+.afun{display:flex;flex-direction:column;gap:8px}
+.aft{font-weight:600;font-size:15px;margin-bottom:2px}
+.fr{display:grid;grid-template-columns:minmax(0,1.3fr) 2fr 28px;gap:10px;align-items:center;font-size:13.5px}
+.fr span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fr i{height:10px;background:var(--soft);border-radius:99px;overflow:hidden}.fr i b{display:block;height:100%;background:var(--athr);border-radius:99px}
+.fr em{font-style:normal;font-weight:700;text-align:left;font-variant-numeric:tabular-nums}
+.aempty{background:var(--athrlt);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.aempty div{display:flex;flex-wrap:wrap;gap:6px}.aempty span{background:var(--card);border-radius:99px;padding:3px 10px;font-size:13px}
+.afil{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.afil button{flex:none;border:1px solid var(--line);background:var(--card);color:inherit;font:inherit;font-size:13px;border-radius:99px;padding:6px 12px;cursor:pointer}
+.afil button.on{background:var(--athrdk);border-color:var(--athrdk);color:#fff}.afil button.z{opacity:.5}
+.mcards{display:flex;flex-direction:column;gap:12px}
+@media (min-width:900px){.screen.adm{max-width:1100px}.adm .mcards{display:grid;grid-template-columns:1fr 1fr;align-items:start}.adm .afil{flex-wrap:wrap;overflow:visible}}
 .mdel{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
 .medb{border:1px solid var(--line);background:none;color:inherit;font:inherit;font-size:13px;font-weight:600;border-radius:10px;padding:6px 12px;cursor:pointer}
 .medw{margin-top:12px;display:flex;flex-direction:column;gap:10px;background:var(--soft,#f6f5f2);border-radius:14px;padding:12px}
@@ -668,9 +681,21 @@ function mval(t,i,k,v){
   if(k==='photos'&&Array.isArray(v))return v.map((u,j)=>'<a href="'+esc(u)+'" target="_blank" rel="noopener">صورة '+(j+1)+'</a>').join(' · ');
   if(Array.isArray(v))return esc(v.join('، '));
   return esc(v);}
+const ADMIN=QP.get('admin')==='1';let AF='';
 function mentorView(d){
   d.stations.forEach((x,i)=>{if(i<5){S.dates[i]=x.date||'';S.mode[i]=x.mode||'auto';}});
-  const T=d.teams||[],n=T.length;
+  const ALL=d.teams||[];const T=ADMIN&&AF?ALL.filter(t=>t.lab&&t.lab[0]===AF):ALL.slice(),n=T.length;
+  const labOf=c=>{const t=ALL.find(x=>String(x.code)===String(c));return ADMIN?(t&&t.lab?t.lab[0]:''):QP.get('m');};
+  let adm='';
+  if(ADMIN){const labs=[];Object.values(LABS).forEach(r=>Object.values(r).forEach(a=>a.forEach(x=>labs.push(x))));
+    const cnt=l=>ALL.filter(t=>t.lab&&t.lab[0]===l).length,sh=l=>esc(l.replace('معمل ',''));
+    const active=labs.filter(x=>cnt(x[0])>0).length,empty=labs.filter(x=>!cnt(x[0]));
+    const fun=STATIONS.map((s,i)=>{const c=ALL.filter(t=>t.a&&t.a[i]).length,p=ALL.length?Math.round(c/ALL.length*100):0;
+      return '<div class="fr"><span>'+(i+1)+'. '+s.n+'</span><i><b style="width:'+p+'%"></b></i><em>'+c+'</em></div>';}).join('');
+    adm='<div class="msum"><div><b>'+ALL.length+'</b><span>فريق</span></div><div><b>'+ALL.reduce((a,t)=>a+t.members.length,0)+'</b><span>طالب</span></div><div><b>'+active+' / '+labs.length+'</b><span>معمل سجّل</span></div></div>'+
+      '<div class="card afun"><div class="aft">كم فريق أنهى كل محطة</div>'+fun+'</div>'+
+      (empty.length?'<div class="aempty"><b>معامل لم يسجّل منها أي فريق ('+empty.length+')</b><div>'+empty.map(x=>'<span>'+sh(x[0])+'</span>').join('')+'</div></div>':'')+
+      '<div class="afil"><button type="button" class="'+(AF?'':'on')+'" data-af="">كل المعامل · '+ALL.length+'</button>'+labs.map(x=>'<button type="button" class="'+(AF===x[0]?'on':'')+(cnt(x[0])?'':' z')+'" data-af="'+esc(x[0])+'">'+sh(x[0])+' · '+cnt(x[0])+'</button>').join('')+'</div>';}
   const cur=[0,1,2,3,4].filter(i=>isOpen(i)).pop();
   const doneN=i=>T.filter(t=>t.a&&t.a[i]).length;
   const sum='<div class="msum"><div><b>'+n+'</b><span>'+(n===1?'فريق':'فرق')+'</span></div>'+
@@ -681,18 +706,19 @@ function mentorView(d){
     const dots='<div class="mdots">'+STATIONS.map((x,i)=>'<span class="'+(A[i]?'ok':isOpen(i)?'due':'')+'" title="'+x.n+'">'+(A[i]?'✓':i+1)+'</span>').join('')+'</div>';
     const det=ML.map((m,i)=>A[i]?'<details><summary>'+(i+1)+'. '+m[0]+'</summary><dl>'+m[1].map(f=>'<dt>'+f[1]+'</dt><dd>'+mval(t,i,f[0],A[i][f[0]])+'</dd>').join('')+'</dl></details>':
       '<div class="mnot">'+(i+1)+'. '+m[0]+' · '+(isOpen(i)?'<b>لم تُنجز بعد</b>':'لم تُفتح')+'</div>').join('');
-    return '<div class="mcard"><div class="mtop">'+plant(st,'mpl2')+'<div><h3>'+esc(t.name)+'</h3><small>رمز '+t.code+' · '+t.members.length+' أعضاء</small><p>'+t.members.map(esc).join('، ')+'</p></div></div>'+dots+det+'<div class="medw" data-ed="'+t.code+'" hidden></div><div class="mdel" data-del="'+t.code+'" data-nm="'+esc(t.name)+'"><button type="button" class="medb" data-edopen="'+t.code+'">✎ تعديل الفريق</button><button type="button" class="mdelb">حذف الفريق</button></div></div>';}).join('')
+    return '<div class="mcard"><div class="mtop">'+plant(st,'mpl2')+'<div><h3>'+esc(t.name)+'</h3><small>'+(ADMIN&&t.lab?esc(t.lab[0])+' · ':'')+'رمز '+t.code+' · '+t.members.length+' أعضاء</small><p>'+t.members.map(esc).join('، ')+'</p></div></div>'+dots+det+'<div class="medw" data-ed="'+t.code+'" hidden></div><div class="mdel" data-del="'+t.code+'" data-nm="'+esc(t.name)+'"><button type="button" class="medb" data-edopen="'+t.code+'">✎ تعديل الفريق</button><button type="button" class="mdelb">حذف الفريق</button></div></div>';}).join('')
     :'<div class="card" style="text-align:center">لم يسجّل أي فريق من هذا المعمل بعد.</div>';
-  app.innerHTML='<div class="screen"><div class="bar">'+LOGO+'<span class="pill2">متابعة المرشد</span></div>'+
-   '<div><div class="eyebrow">برنامج أثر · متابعة المعمل</div><h2 class="title">'+esc(d.lab)+'</h2></div>'+sum+cards+
+  app.innerHTML='<div class="screen'+(ADMIN?' adm wide':'')+'"><div class="bar">'+LOGO+'<span class="pill2">'+(ADMIN?'لوحة الإدارة':'متابعة المرشد')+'</span></div>'+
+   '<div><div class="eyebrow">برنامج أثر · '+(ADMIN?'كل المعامل':'متابعة المعمل')+'</div><h2 class="title">'+(ADMIN?(AF?esc(AF):'مشاريع الفرق'):esc(d.lab))+'</h2></div>'+(ADMIN?adm:sum)+'<div class="mcards">'+cards+'</div>'+
    '<button class="btn ghost" id="mref">تحديث</button></div>';
   document.getElementById('mref').onclick=mentorLoad;
+  app.querySelectorAll('[data-af]').forEach(b=>b.onclick=()=>{AF=b.dataset.af;mentorView(d);});
   app.querySelectorAll('[data-del]').forEach(w=>{const code=w.dataset.del,nm=w.dataset.nm;
     const idle=()=>{w.innerHTML='<button type="button" class="medb" data-edopen="'+code+'">✎ تعديل الفريق</button><button type="button" class="mdelb">حذف الفريق</button>';w.querySelector('.mdelb').onclick=ask;w.querySelector('.medb').onclick=()=>openEd(code);};
     const ask=()=>{w.innerHTML='<div class="mdelq"><span>يُحذف فريق «'+nm+'» وإجاباته من صفحتك. متأكد؟</span><button type="button" class="mdely">نعم، احذف</button><button type="button" class="mdeln">تراجع</button></div>';
       w.querySelector('.mdeln').onclick=idle;
       w.querySelector('.mdely').onclick=()=>{const y=w.querySelector('.mdely');y.disabled=true;y.textContent='جارٍ الحذف…';
-        apiPost({action:'mdelete',lab:QP.get('m'),k:QP.get('k')||'',code:code}).then(r=>{if(!r.ok)throw 0;toast('حُذف الفريق ✓');mentorLoad();})
+        apiPost({action:'mdelete',lab:labOf(code),k:QP.get('k')||'',code:code}).then(r=>{if(!r.ok)throw 0;toast('حُذف الفريق ✓');mentorLoad();})
         .catch(()=>{toast('تعذّر الحذف. حدّث الصفحة وحاول مرة ثانية.',1);idle();});};};
     w.querySelector('.mdelb').onclick=ask;w.querySelector('.medb').onclick=()=>openEd(code);});
   function openEd(code){const t=(d.teams||[]).find(x=>String(x.code)===String(code));const box=app.querySelector('[data-ed="'+code+'"]');if(!t||!box)return;
@@ -706,15 +732,15 @@ function mentorView(d){
       if(!n||ms.length<3||ms.length>6){toast(!n?'اكتب اسم الفريق.':'الفريق من 3 إلى 6 أعضاء.',1);return;}
       if(!ar(n)||!ms.every(ar)){toast('الأسماء بالحروف العربية فقط.',1);return;}
       ok.disabled=true;ok.textContent='جارٍ الحفظ…';
-      apiPost({action:'medit',lab:QP.get('m'),k:QP.get('k')||'',code:code,name:n,members:ms}).then(r=>{if(!r.ok)throw 0;toast('حُفظ التعديل ✓');mentorLoad();})
+      apiPost({action:'medit',lab:labOf(code),k:QP.get('k')||'',code:code,name:n,members:ms}).then(r=>{if(!r.ok)throw 0;toast('حُفظ التعديل ✓');mentorLoad();})
       .catch(()=>{ok.disabled=false;ok.textContent='احفظ';toast('تعذّر الحفظ. حدّث الصفحة وحاول مرة ثانية.',1);});};}
   }
 function mentorLoad(){
   app.innerHTML='<div class="screen"><div class="card" style="text-align:center">جارٍ التحميل…</div></div>';
-  apiGet({action:'lab',lab:QP.get('m'),k:QP.get('k')||''}).then(d=>{
+  apiGet(ADMIN?{action:'all',k:QP.get('k')||''}:{action:'lab',lab:QP.get('m'),k:QP.get('k')||''}).then(d=>{
     if(!d.ok){app.innerHTML='<div class="screen"><div class="card" style="text-align:center">الرابط غير صحيح. تواصلوا مع فريق نون.</div></div>';return;}
     mentorView(d);}).catch(()=>{app.innerHTML='<div class="screen"><div class="card" style="text-align:center">تعذّر الاتصال. تأكدوا من الإنترنت وحدّثوا الصفحة.</div></div>';});}
-if(QP.get('m')){mentorLoad();}else{
+if(QP.get('m')||ADMIN){mentorLoad();}else{
 render();
 loadConfig();
 }
