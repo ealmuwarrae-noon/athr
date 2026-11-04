@@ -72,9 +72,14 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .green::before{content:"";position:absolute;inset:0 0 auto;height:120px;background:repeating-linear-gradient(90deg,transparent 0 78px,var(--ghl) 78px 80px);opacity:.6;pointer-events:none}
 .ghead{position:relative;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:flex-end}
 .geb{font-size:13px;font-weight:700;color:#1f7a5a;letter-spacing:.3px}
-.gt{font-size:20px;font-weight:600}.gt b{font-size:34px;color:#1f7a5a;font-variant-numeric:tabular-nums}
+.gt{font-size:22px;font-weight:700}.gt b{font-size:34px;color:#1f7a5a;font-variant-numeric:tabular-nums}
 .gleg{display:flex;flex-wrap:wrap;gap:6px}.gleg span{font-size:12.5px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:2px 10px}.gleg b{color:#1f7a5a}
 .gnote{position:relative;margin:0;font-size:13px;color:var(--mut);line-height:1.7}
+.gtop{display:flex;flex-direction:column;gap:8px}
+.gn{font-size:13px;color:var(--mut)}.gn b{font-size:22px;color:#1f7a5a;font-variant-numeric:tabular-nums}
+.gbare{background:var(--card);padding:14px 16px;gap:10px}.gbare::before{display:none}.gbare .gt{font-size:18px}
+.gbares{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}.gbare .seeds{border:0;padding:0}
+.sdl{width:100%;font-size:12px;color:var(--mut)}
 .shelves{display:grid;gap:22px}
 .shelf{position:relative}
 .slab{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;padding:0 4px}
@@ -744,16 +749,18 @@ function mentorView(d){
     adm='<div class="msum"><div><b>'+ALL.length+'</b><span>فريق</span></div><div><b>'+ALL.reduce((a,t)=>a+t.members.length,0)+'</b><span>طالب</span></div><div><b>'+active+' / '+labs.length+'</b><span>معمل سجّل</span></div></div>';
     const stg=ALL.map(t=>Math.min(5,Object.keys(t.a||{}).length)),by=[0,1,2,3,4,5].map(k=>stg.filter(x=>x===k).length);
     const ord=labs.slice().sort((x,y)=>cnt(y[0])-cnt(x[0]));
-    const shelves=ord.filter(x=>cnt(x[0])).map(x=>{const ts=ALL.filter(t=>t.lab&&t.lab[0]===x[0]).sort((p,q)=>Object.keys(q.a||{}).length-Object.keys(p.a||{}).length);
-      const avg=ts.length?ts.reduce((a,t)=>a+Math.min(5,Object.keys(t.a||{}).length),0)/ts.length:0;
-      const pots=ts.length?ts.map(t=>{const st=Math.min(5,Object.keys(t.a||{}).length);return '<button type="button" class="pot" data-open="'+t.code+'" title="'+esc(t.name)+' · '+STAGES[st]+'">'+plant(st,'ppl')+'<span class="ptag">'+esc(t.name.replace(/^فريق\s+/,''))+'</span></button>';}).join('')
-        :'<div class="pempty"><i></i><i></i><i></i><span>بانتظار أول بذرة</span></div>';
-      return '<div class="shelf'+(ts.length?'':' bare')+'"><div class="slab"><b>'+sh(x[0])+'</b><small>'+esc(x[1])+'</small><span class="scount">'+(ts.length?ts.length+(ts.length===1?' نبتة':' نبتات'):'فارغ')+'</span></div>'+
-        '<div class="spots">'+pots+'</div></div>';}).join('')+(empty.length?'<div class="shelf bare"><div class="slab"><b>لم تُزرع بعد</b><span class="scount">'+empty.length+' معامل</span></div><div class="seeds">'+empty.map(x=>'<span class="seed"><b>'+sh(x[0])+'</b><small>'+esc(x[1])+'</small></span>').join('')+'</div></div>':'');
-    adm+='<section class="green"><div class="ghead"><div><div class="geb">مشتل أثر</div><div class="gt"><b>'+ALL.length+'</b> نبتة في '+active+(active===1?' معمل':' معامل')+'</div></div>'+
-      '<div class="gleg">'+STAGES.map((nm,k)=>by[k]?'<span><b>'+by[k]+'</b> '+nm+'</span>':'').join('')+'</div></div>'+
-      '<p class="gnote">كل رفّ معمل، وكل أصيص فريق، والنبتة تكبر مع كل محطة. اضغط أي نبتة لتفتح مشروعها.</p>'+
-      '<div class="shelves">'+shelves+'</div></section>'+
+    const shelf=x=>{const ts=ALL.filter(t=>t.lab&&t.lab[0]===x[0]).sort((p,q)=>Object.keys(q.a||{}).length-Object.keys(p.a||{}).length);
+      const pots=ts.map(t=>{const st=Math.min(5,Object.keys(t.a||{}).length);return '<button type="button" class="pot" data-open="'+t.code+'" title="'+esc(t.name)+' · '+STAGES[st]+'">'+plant(st,'ppl')+'<span class="ptag">'+esc(t.name.replace(/^فريق\s+/,''))+'</span></button>';}).join('');
+      return '<div class="shelf"><div class="slab"><b>'+sh(x[0])+'</b><small>'+esc(x[1])+'</small><span class="scount">'+ts.length+(ts.length===1?' نبتة':' نبتات')+'</span></div><div class="spots">'+pots+'</div></div>';};
+    const gardens=Object.keys(LABS).map(r=>{const ls=[];Object.values(LABS[r]).forEach(a=>a.forEach(x=>ls.push(x)));const n=ls.reduce((a,x)=>a+cnt(x[0]),0);return {r,ls,n};}).sort((a,b)=>b.n-a.n).map(g=>{
+      const full=g.ls.filter(x=>cnt(x[0])).sort((x,y)=>cnt(y[0])-cnt(x[0])),bare=g.ls.filter(x=>!cnt(x[0]));
+      return '<section class="green'+(g.n?'':' gbare')+'"><div class="ghead"><div><div class="geb">حديقة تمكين</div><div class="gt">في '+RNAME[g.r]+'</div></div><div class="gn">'+(g.n?'<b>'+g.n+'</b> '+(g.n===1?'نبتة':'نبتات')+' · '+full.length+' من '+g.ls.length+(g.ls.length===1?' معمل':' معامل'):'لم تُزرع بعد')+'</div></div>'+
+        (full.length?'<div class="shelves">'+full.map(shelf).join('')+'</div>':'')+
+        (bare.length?'<div class="seeds">'+(full.length?'<span class="sdl">بانتظار أول بذرة</span>':'')+bare.map(x=>'<span class="seed"><b>'+sh(x[0])+'</b><small>'+esc(x[1])+'</small></span>').join('')+'</div>':'')+'</section>';});
+    const gfull=gardens.filter(h=>h.indexOf('gbare')<0).join(''),gb=gardens.filter(h=>h.indexOf('gbare')>=0);
+    adm+='<div class="gtop"><div class="gleg">'+STAGES.map((nm,k)=>by[k]?'<span><b>'+by[k]+'</b> '+nm+'</span>':'').join('')+'</div>'+
+      '<p class="gnote">كل رفّ معمل، وكل أصيص فريق، والنبتة تكبر مع كل محطة. اضغط أي نبتة لتفتح مشروعها.</p></div>'+gfull+(gb.length?'<div class="gbares">'+gb.join('')+'</div>':'')+
+
       '<div class="card afun"><div class="aft">كم فريق أنهى كل محطة</div>'+fun+'</div>';}
   const cur=[0,1,2,3,4].filter(i=>isOpen(i)).pop();
   const doneN=i=>T.filter(t=>t.a&&t.a[i]).length;
