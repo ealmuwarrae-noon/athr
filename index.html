@@ -11,15 +11,15 @@
   --roadbg:#f6dde8; --roaddot:#ffffff;
   --bg:#fbfbf9; --card:#ffffff; --fg:#15161A; --mut:#7d7d78; --line:#eae7df; --soft:#f3f1ec; --land:#e9e6de;
   --mint:#64D8AE; --teal:#0C8075; --mintlt:#E6F7F1;
-  --athr:#d9558f; --athrdk:#a8336a; --athrlt:#fbe9f1; --athrtx:#a8336a;
+  --athr:#d9558f; --athrdk:#a8336a; --athrlt:#fbe9f1; --athrtx:#a8336a; --gh1:#e9f5ef; --ghl:#ffffff; --tag:#fffaf0; --tagb:#e8dcc4;
   --gold:#d99b2b; --leaf:#3fa27c; --soil:#6b4a2f; --pot:#0C8075; --potrim:#0a6b62; --sky:#E6F7F1;
   --font:"IBM Plex Sans Arabic",-apple-system,"SF Arabic","Segoe UI",Tahoma,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#141518; --card:#1d1f23; --fg:#ecebe7; --mut:#9b9a95; --line:#2d2f34; --soft:#25272c; --land:#2a2c31;
+  --bg:#141518; --card:#1d1f23; --fg:#ecebe7; --mut:#9b9a95; --line:#2d2f34; --soft:#25272c; --land:#2a2c31; --gh1:#1c2a24; --ghl:#24332c; --tag:#2a2620; --tagb:#4a4033;
   --mintlt:#16312a; --athrlt:#3a1d2b; --athrtx:#f08bb6; --sky:#17302a; --leaf:#4bb88d; --roadbg:#3a2530; --roaddot:#6b4a5a; --maplab:#5a2a40; --maplabh:#7a3656; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#141518; --card:#1d1f23; --fg:#ecebe7; --mut:#9b9a95; --line:#2d2f34; --soft:#25272c; --land:#2a2c31;
+  --bg:#141518; --card:#1d1f23; --fg:#ecebe7; --mut:#9b9a95; --line:#2d2f34; --soft:#25272c; --land:#2a2c31; --gh1:#1c2a24; --ghl:#24332c; --tag:#2a2620; --tagb:#4a4033;
   --mintlt:#16312a; --athrlt:#3a1d2b; --athrtx:#f08bb6; --sky:#17302a; --leaf:#4bb88d; --roadbg:#3a2530; --roaddot:#6b4a5a; --maplab:#5a2a40; --maplabh:#7a3656; color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -68,6 +68,34 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .agleg{display:flex;flex-wrap:wrap;gap:6px}.agleg span{font-size:12.5px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
 .agleg b{color:#1f7a5a}
 @media (min-width:900px){.agrid span{width:50px}.agp{width:48px}}
+.green{position:relative;border:1px solid var(--line);border-radius:26px;padding:18px 16px 20px;background:linear-gradient(180deg,var(--gh1) 0,var(--card) 220px);overflow:hidden;display:flex;flex-direction:column;gap:14px}
+.green::before{content:"";position:absolute;inset:0 0 auto;height:120px;background:repeating-linear-gradient(90deg,transparent 0 78px,var(--ghl) 78px 80px);opacity:.6;pointer-events:none}
+.ghead{position:relative;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:flex-end}
+.geb{font-size:13px;font-weight:700;color:#1f7a5a;letter-spacing:.3px}
+.gt{font-size:20px;font-weight:600}.gt b{font-size:34px;color:#1f7a5a;font-variant-numeric:tabular-nums}
+.gleg{display:flex;flex-wrap:wrap;gap:6px}.gleg span{font-size:12.5px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:2px 10px}.gleg b{color:#1f7a5a}
+.gnote{position:relative;margin:0;font-size:13px;color:var(--mut);line-height:1.7}
+.shelves{display:grid;gap:22px}
+.shelf{position:relative}
+.slab{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;padding:0 4px}
+.slab b{font-size:15px}.slab small{font-size:12px;color:var(--mut)}.scount{margin-right:auto;font-size:12px;font-weight:600;color:#1f7a5a}
+.bare .scount{color:var(--mut)}
+.spots{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));grid-auto-rows:108px;column-gap:4px;background:repeating-linear-gradient(180deg,transparent 0 86px,#d6ab7f 86px 94px,#a97b4f 94px 98px,transparent 98px 108px)}
+.pot{position:relative;border:0;background:none;color:inherit;font:inherit;width:100%;height:108px;padding:0 0 22px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;cursor:pointer;transition:transform .15s}
+.pot:hover{transform:translateY(-3px)}.pot:focus-visible{outline:2px solid var(--athr);outline-offset:2px;border-radius:8px}
+.ppl{width:54px;height:auto;display:block}.ppl>circle{display:none}
+.ptag{font-size:10.5px;line-height:1.5;background:var(--tag);border:1px solid var(--tagb);border-radius:4px;padding:0 5px;max-width:62px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;position:absolute;top:89px;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.board{position:relative;height:12px;border-radius:3px;background:linear-gradient(180deg,#d1a679,#a97b4f);box-shadow:0 5px 0 -1px #8a6140}
+.board i{position:absolute;left:auto;right:0;bottom:-9px;height:3px;border-radius:99px;background:#2fb487}
+.board::before,.board::after{content:"";position:absolute;top:12px;width:8px;height:16px;background:#8a6140;border-radius:0 0 3px 3px}
+.board::before{right:14px}.board::after{left:14px}
+.seeds{display:flex;flex-wrap:wrap;gap:8px;padding:10px;border:1.5px dashed var(--line);border-radius:14px}
+.seed{display:flex;flex-direction:column;background:var(--tag);border:1px solid var(--tagb);border-radius:8px;padding:5px 10px;line-height:1.4}.seed b{font-size:13px}.seed small{font-size:11px;color:var(--mut)}
+.pempty{display:flex;align-items:flex-end;gap:10px;height:92px;padding-bottom:2px}
+.pempty i{width:30px;height:22px;background:var(--line);clip-path:polygon(0 0,100% 0,84% 100%,16% 100%)}
+.pempty span{font-size:12.5px;color:var(--mut);margin-right:6px;align-self:center}
+@media (min-width:900px){.shelves{grid-template-columns:1fr 1fr;column-gap:28px}}
+@media (prefers-reduced-motion:reduce){.pot{transition:none}}
 .atiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .atile{border:1px solid var(--line);background:var(--card);color:inherit;font:inherit;border-radius:18px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;cursor:pointer;transition:transform .12s,border-color .12s}
 .atile:hover{transform:translateY(-2px);border-color:var(--athr)}
@@ -714,14 +742,20 @@ function mentorView(d){
     const active=labs.filter(x=>cnt(x[0])>0).length,empty=labs.filter(x=>!cnt(x[0]));
     const fun=STATIONS.map((s,i)=>{const c=ALL.filter(t=>t.a&&t.a[i]).length,p=ALL.length?Math.round(c/ALL.length*100):0;
       return '<div class="fr"><span>'+(i+1)+'. '+s.n+'</span><i><b style="width:'+p+'%"></b></i><em>'+c+'</em></div>';}).join('');
-    adm='<div class="msum"><div><b>'+ALL.length+'</b><span>فريق</span></div><div><b>'+ALL.reduce((a,t)=>a+t.members.length,0)+'</b><span>طالب</span></div><div><b>'+active+' / '+labs.length+'</b><span>معمل سجّل</span></div></div>'+
-      (()=>{const stg=ALL.map(t=>Math.min(5,Object.keys(t.a||{}).length));const by=[0,1,2,3,4,5].map(k=>stg.filter(x=>x===k).length);
-        return '<div class="card agard"><div class="agh"><b class="agn">'+ALL.length+'</b><div><div class="aft">نبتة في حديقة تمكين</div><small>كل فريق نبتة تكبر مع كل محطة ينجزها</small></div></div>'+
-        '<div class="agrid">'+ALL.slice().sort((x,y)=>Object.keys(y.a||{}).length-Object.keys(x.a||{}).length).map(t=>'<span title="'+esc(t.name)+' · '+esc((t.lab?t.lab[0]:'').replace('معمل ',''))+'">'+plant(Math.min(5,Object.keys(t.a||{}).length),'agp')+'</span>').join('')+'</div>'+
-        '<div class="agleg">'+STAGES.map((n,k)=>by[k]?'<span><b>'+by[k]+'</b> '+n+'</span>':'').join('')+'</div></div>';})()+
-      '<div class="card afun"><div class="aft">كم فريق أنهى كل محطة</div>'+fun+'</div>'+
-      (empty.length?'<div class="aempty"><b>معامل لم يسجّل منها أي فريق ('+empty.length+')</b><div>'+empty.map(x=>'<span>'+sh(x[0])+'</span>').join('')+'</div></div>':'')+
-      '<div class="afil"><button type="button" class="'+(AF?'':'on')+'" data-af="">كل المعامل · '+ALL.length+'</button>'+labs.map(x=>'<button type="button" class="'+(AF===x[0]?'on':'')+(cnt(x[0])?'':' z')+'" data-af="'+esc(x[0])+'">'+sh(x[0])+' · '+cnt(x[0])+'</button>').join('')+'</div>';}
+    adm='<div class="msum"><div><b>'+ALL.length+'</b><span>فريق</span></div><div><b>'+ALL.reduce((a,t)=>a+t.members.length,0)+'</b><span>طالب</span></div><div><b>'+active+' / '+labs.length+'</b><span>معمل سجّل</span></div></div>';
+    const stg=ALL.map(t=>Math.min(5,Object.keys(t.a||{}).length)),by=[0,1,2,3,4,5].map(k=>stg.filter(x=>x===k).length);
+    const ord=labs.slice().sort((x,y)=>cnt(y[0])-cnt(x[0]));
+    const shelves=ord.filter(x=>cnt(x[0])).map(x=>{const ts=ALL.filter(t=>t.lab&&t.lab[0]===x[0]).sort((p,q)=>Object.keys(q.a||{}).length-Object.keys(p.a||{}).length);
+      const avg=ts.length?ts.reduce((a,t)=>a+Math.min(5,Object.keys(t.a||{}).length),0)/ts.length:0;
+      const pots=ts.length?ts.map(t=>{const st=Math.min(5,Object.keys(t.a||{}).length);return '<button type="button" class="pot" data-open="'+t.code+'" title="'+esc(t.name)+' · '+STAGES[st]+'">'+plant(st,'ppl')+'<span class="ptag">'+esc(t.name.replace(/^فريق\s+/,''))+'</span></button>';}).join('')
+        :'<div class="pempty"><i></i><i></i><i></i><span>بانتظار أول بذرة</span></div>';
+      return '<div class="shelf'+(ts.length?'':' bare')+'"><div class="slab"><b>'+sh(x[0])+'</b><small>'+esc(x[1])+'</small><span class="scount">'+(ts.length?ts.length+(ts.length===1?' نبتة':' نبتات'):'فارغ')+'</span></div>'+
+        '<div class="spots">'+pots+'</div></div>';}).join('')+(empty.length?'<div class="shelf bare"><div class="slab"><b>لم تُزرع بعد</b><span class="scount">'+empty.length+' معامل</span></div><div class="seeds">'+empty.map(x=>'<span class="seed"><b>'+sh(x[0])+'</b><small>'+esc(x[1])+'</small></span>').join('')+'</div></div>':'');
+    adm+='<section class="green"><div class="ghead"><div><div class="geb">مشتل أثر</div><div class="gt"><b>'+ALL.length+'</b> نبتة في '+active+(active===1?' معمل':' معامل')+'</div></div>'+
+      '<div class="gleg">'+STAGES.map((nm,k)=>by[k]?'<span><b>'+by[k]+'</b> '+nm+'</span>':'').join('')+'</div></div>'+
+      '<p class="gnote">كل رفّ معمل، وكل أصيص فريق، والنبتة تكبر مع كل محطة. اضغط أي نبتة لتفتح مشروعها.</p>'+
+      '<div class="shelves">'+shelves+'</div></section>'+
+      '<div class="card afun"><div class="aft">كم فريق أنهى كل محطة</div>'+fun+'</div>';}
   const cur=[0,1,2,3,4].filter(i=>isOpen(i)).pop();
   const doneN=i=>T.filter(t=>t.a&&t.a[i]).length;
   const sum='<div class="msum"><div><b>'+n+'</b><span>'+(n===1?'فريق':'فرق')+'</span></div>'+
@@ -734,9 +768,7 @@ function mentorView(d){
       '<div class="mnot">'+(i+1)+'. '+m[0]+' · '+(isOpen(i)?'<b>لم تُنجز بعد</b>':'لم تُفتح')+'</div>').join('');
     return '<div class="mcard" data-card="'+t.code+'"><div class="mtop">'+plant(st,'mpl2')+'<div><h3>'+esc(t.name)+'</h3><small>'+(ADMIN&&t.lab?esc(t.lab[0])+' · ':'')+'رمز '+t.code+' · '+t.members.length+' أعضاء</small><p>'+t.members.map(esc).join('، ')+'</p></div></div>'+dots+det+'<div class="medw" data-ed="'+t.code+'" hidden></div><div class="mdel" data-del="'+t.code+'" data-nm="'+esc(t.name)+'"><button type="button" class="medb" data-edopen="'+t.code+'">✎ تعديل الفريق</button><button type="button" class="mdelb">حذف الفريق</button></div></div>';}).join('')
     :'<div class="card" style="text-align:center">لم يسجّل أي فريق من هذا المعمل بعد.</div>';
-  const atiles=!ADMIN?'':(T.length?'<div class="atiles">'+T.map(t=>{const A=t.a||{},st=Object.keys(A).length;
-      return '<button type="button" class="atile" data-open="'+t.code+'">'+plant(st,'atpl')+'<b>'+esc(t.name)+'</b><small>'+esc((t.lab?t.lab[0]:'').replace('معمل ',''))+' · '+t.members.length+' أعضاء</small><span class="adots">'+STATIONS.map((x,i)=>'<i class="'+(A[i]?'ok':isOpen(i)?'due':'')+'"></i>').join('')+'</span></button>';}).join('')+'</div>':'<div class="card" style="text-align:center">لا توجد فرق في هذا المعمل بعد.</div>')+
-      '<div id="apool" hidden>'+(T.length?cards:'')+'</div><div class="adet" id="adet" hidden><div class="adetin"><button type="button" class="adx" aria-label="إغلاق">✕</button><div id="adslot"></div></div></div>';
+  const atiles=!ADMIN?'':'<div id="apool" hidden>'+(T.length?cards:'')+'</div><div class="adet" id="adet" hidden><div class="adetin"><button type="button" class="adx" aria-label="إغلاق">✕</button><div id="adslot"></div></div></div>';
   app.innerHTML='<div class="screen'+(ADMIN?' adm wide':'')+'"><div class="bar">'+LOGO+'<span class="pill2">'+(ADMIN?'لوحة الإدارة':'متابعة المرشد')+'</span></div>'+
    '<div><div class="eyebrow">برنامج أثر · '+(ADMIN?'كل المعامل':'متابعة المعمل')+'</div><h2 class="title">'+(ADMIN?(AF?esc(AF):'مشاريع الفرق'):esc(d.lab))+'</h2></div>'+(ADMIN?adm:sum)+(ADMIN?atiles:'<div class="mcards">'+cards+'</div>')+
    '<button class="btn ghost" id="mref">تحديث</button></div>';
