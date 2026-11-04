@@ -75,6 +75,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .gt{font-size:22px;font-weight:700}.gt b{font-size:34px;color:#1f7a5a;font-variant-numeric:tabular-nums}
 .gleg{display:flex;flex-wrap:wrap;gap:6px}.gleg span{font-size:12.5px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:2px 10px}.gleg b{color:#1f7a5a}
 .gnote{position:relative;margin:0;font-size:13px;color:var(--mut);line-height:1.7}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px}
+.rcard{border:1px solid var(--line);background:var(--card);color:inherit;font:inherit;text-align:right;border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:border-color .15s,transform .15s}
+.rcard:hover{transform:translateY(-2px)}.rcard.on{border-color:#2fb487;box-shadow:0 0 0 2px #2fb48733;background:var(--gh1)}
+.rcard b{font-size:16px}.rcard small{font-size:12px;color:var(--mut);white-space:nowrap}
+.rbare{border-style:dashed}.rbare .rsh{border-bottom-color:var(--line)}
+.rsh{display:flex;gap:3px;align-items:flex-end;height:22px;border-bottom:4px solid #b58456;padding:0 2px;overflow:hidden}
+.rp{width:8px;border-radius:3px 3px 0 0;background:#2fb487;flex:none}.rp.s0{height:5px;background:#1f7a5a}.rp.s1{height:9px}.rp.s2{height:13px}.rp.s3{height:16px}.rp.s4,.rp.s5{height:19px}
 .gtop{display:flex;flex-direction:column;gap:8px}
 .gn{font-size:13px;color:var(--mut)}.gn b{font-size:22px;color:#1f7a5a;font-variant-numeric:tabular-nums}
 .gbare{background:var(--card);padding:14px 16px;gap:10px}.gbare::before{display:none}.gbare .gt{font-size:18px}
@@ -752,14 +759,17 @@ function mentorView(d){
     const shelf=x=>{const ts=ALL.filter(t=>t.lab&&t.lab[0]===x[0]).sort((p,q)=>Object.keys(q.a||{}).length-Object.keys(p.a||{}).length);
       const pots=ts.map(t=>{const st=Math.min(5,Object.keys(t.a||{}).length);return '<button type="button" class="pot" data-open="'+t.code+'" title="'+esc(t.name)+' · '+STAGES[st]+'">'+plant(st,'ppl')+'<span class="ptag">'+esc(t.name.replace(/^فريق\s+/,''))+'</span></button>';}).join('');
       return '<div class="shelf"><div class="slab"><b>'+sh(x[0])+'</b><small>'+esc(x[1])+'</small><span class="scount">'+ts.length+(ts.length===1?' نبتة':' نبتات')+'</span></div><div class="spots">'+pots+'</div></div>';};
-    const gardens=Object.keys(LABS).map(r=>{const ls=[];Object.values(LABS[r]).forEach(a=>a.forEach(x=>ls.push(x)));const n=ls.reduce((a,x)=>a+cnt(x[0]),0);return {r,ls,n};}).sort((a,b)=>b.n-a.n).map(g=>{
+    const gs=Object.keys(LABS).map(r=>{const ls=[];Object.values(LABS[r]).forEach(a=>a.forEach(x=>ls.push(x)));const n=ls.reduce((a,x)=>a+cnt(x[0]),0);return {r,ls,n};}).sort((a,b)=>b.n-a.n);
+    const gardens=gs.map((g,gi)=>{
       const full=g.ls.filter(x=>cnt(x[0])).sort((x,y)=>cnt(y[0])-cnt(x[0])),bare=g.ls.filter(x=>!cnt(x[0]));
-      return '<section class="green'+(g.n?'':' gbare')+'"><div class="ghead"><div><div class="geb">حديقة تمكين</div><div class="gt">في '+RNAME[g.r]+'</div></div><div class="gn">'+(g.n?'<b>'+g.n+'</b> '+(g.n===1?'نبتة':'نبتات')+' · '+full.length+' من '+g.ls.length+(g.ls.length===1?' معمل':' معامل'):'لم تُزرع بعد')+'</div></div>'+
+      return '<section class="green'+(g.n?'':' gbare')+'" data-gd="'+gi+'"'+(gi?' hidden':'')+'><div class="ghead"><div><div class="geb">حديقة تمكين</div><div class="gt">في '+RNAME[g.r]+'</div></div><div class="gn">'+(g.n?'<b>'+g.n+'</b> '+(g.n===1?'نبتة':'نبتات')+' · '+full.length+' من '+g.ls.length+(g.ls.length===1?' معمل':' معامل'):'لم تُزرع بعد')+'</div></div>'+
         (full.length?'<div class="shelves">'+full.map(shelf).join('')+'</div>':'')+
         (bare.length?'<div class="seeds">'+(full.length?'<span class="sdl">بانتظار أول بذرة</span>':'')+bare.map(x=>'<span class="seed"><b>'+sh(x[0])+'</b><small>'+esc(x[1])+'</small></span>').join('')+'</div>':'')+'</section>';});
-    const gfull=gardens.filter(h=>h.indexOf('gbare')<0).join(''),gb=gardens.filter(h=>h.indexOf('gbare')>=0);
+    const rcards='<div class="rgrid">'+gs.map((g,gi)=>{const ts=ALL.filter(t=>t.lab&&g.ls.some(x=>x[0]===t.lab[0])),act=g.ls.filter(x=>cnt(x[0])).length;
+      const mini=ts.slice(0,14).map(t=>'<i class="rp s'+Math.min(5,Object.keys(t.a||{}).length)+'"></i>').join('');
+      return '<button type="button" class="rcard'+(g.n?'':' rbare')+(gi?'':' on')+'" data-rg="'+gi+'"><b>'+RNAME[g.r]+'</b><span class="rsh">'+mini+'</span><small>'+(g.n?g.n+(g.n===1?' نبتة':' نبتات')+' · '+act+'/'+g.ls.length+' معمل':'لم تُزرع بعد')+'</small></button>';}).join('')+'</div>';
     adm+='<div class="gtop"><div class="gleg">'+STAGES.map((nm,k)=>by[k]?'<span><b>'+by[k]+'</b> '+nm+'</span>':'').join('')+'</div>'+
-      '<p class="gnote">كل رفّ معمل، وكل أصيص فريق، والنبتة تكبر مع كل محطة. اضغط أي نبتة لتفتح مشروعها.</p></div>'+gfull+(gb.length?'<div class="gbares">'+gb.join('')+'</div>':'')+
+      '<p class="gnote">كل رفّ معمل، وكل أصيص فريق، والنبتة تكبر مع كل محطة. اضغط أي نبتة لتفتح مشروعها.</p></div>'+rcards+gardens.join('')+
 
       '<div class="card afun"><div class="aft">كم فريق أنهى كل محطة</div>'+fun+'</div>';}
   const cur=[0,1,2,3,4].filter(i=>isOpen(i)).pop();
@@ -782,6 +792,7 @@ function mentorView(d){
   app.querySelectorAll('[data-af]').forEach(b=>b.onclick=()=>{AF=b.dataset.af;mentorView(d);});
   if(ADMIN){const det=document.getElementById('adet'),slot=document.getElementById('adslot'),pool=document.getElementById('apool');
     const close=()=>{[...slot.children].forEach(c=>pool.appendChild(c));det.hidden=true;document.body.style.overflow='';};
+    app.querySelectorAll('[data-rg]').forEach(b=>b.onclick=()=>{app.querySelectorAll('[data-rg]').forEach(x=>x.classList.toggle('on',x===b));app.querySelectorAll('[data-gd]').forEach(g=>g.hidden=g.dataset.gd!==b.dataset.rg);});
     app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const c=pool.querySelector('[data-card="'+b.dataset.open+'"]');if(!c)return;slot.appendChild(c);det.hidden=false;document.body.style.overflow='hidden';det.querySelector('.adetin').scrollTop=0;});
     det.querySelector('.adx').onclick=close;det.onclick=e=>{if(e.target===det)close();};
     document.onkeydown=e=>{if(e.key==='Escape'&&!det.hidden)close();};}
